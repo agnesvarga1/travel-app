@@ -3,7 +3,7 @@ import NavMobile from "./components/NavMobile.vue";
 </script>
 
 <template class="relative">
-  <h1 class="text-primary text-3xl font-heading">Hello</h1>
+  <router-view></router-view>
   <NavMobile />
 </template>
 
