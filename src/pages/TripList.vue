@@ -1,7 +1,8 @@
 <script setup></script>
 
 <template>
-  <h1>Trip List</h1>
+  <div class="bg-light">
+    <h1>Add trip</h1>
+  </div>
 </template>
-
 <style scoped></style>
