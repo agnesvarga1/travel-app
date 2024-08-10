@@ -1,0 +1,131 @@
+{
+  "trips": [
+    {
+      "id": 1,
+      "title": "Paris Adventure",
+      "description": "Explore the best of Paris in 4 days, including iconic landmarks, museums, and charming neighborhoods.",
+      "startDate": "2024-09-01",
+      "endDate": "2024-09-04",
+      "cover": "paris.jpg",
+      "notes": "",
+      "days": [
+        {
+          "date": "2024-09-01",
+          "stops": [
+            {
+              "title": "Eiffel Tower",
+              "description": "Visit the iconic Eiffel Tower and enjoy panoramic views of Paris.",
+              "latitude": 48.8584,
+              "longitude": 2.2945,
+              "image": "eiffel_tower.jpg",
+              "notes": "Consider visiting early in the morning to avoid long queues.",
+              "rating": 5
+            },
+            {
+              "title": "Champs-Élysées",
+              "description": "Stroll down the famous avenue and enjoy shopping and cafes.",
+              "latitude": 48.8668,
+              "longitude": 2.3115,
+              "image": "champs_elysees.jpg",
+              "notes": "Great place for a leisurely walk and some shopping.",
+              "rating": 4
+            }
+          ]
+        },
+        {
+          "date": "2024-09-02",
+          "stops": [
+            {
+              "title": "Louvre Museum",
+              "description": "Explore the world's largest art museum, home to the Mona Lisa.",
+              "latitude": 48.8606,
+              "longitude": 2.3376,
+              "image": "louvre.jpg",
+              "notes": "Plan at least half a day to explore the museum's vast collections.",
+              "rating": 5
+            },
+            {
+              "title": "Seine River Cruise",
+              "description": "Enjoy a relaxing cruise along the Seine River, with views of Paris's landmarks.",
+              "latitude": 48.8566,
+              "longitude": 2.3522,
+              "image": "seine_cruise.jpg",
+              "notes": "Evening cruises offer beautiful views of the city illuminated.",
+              "rating": 5
+            }
+          ]
+        },
+        {
+          "date": "2024-09-03",
+          "stops": [
+            {
+              "title": "Montmartre & Sacré-Cœur",
+              "description": "Explore the artistic neighborhood of Montmartre and visit the Sacré-Cœur Basilica.",
+              "latitude": 48.8867,
+              "longitude": 2.3431,
+              "image": "montmartre.jpg",
+              "notes": "Walk up the steps for a great view of Paris.",
+              "rating": 4
+            },
+            {
+              "title": "Moulin Rouge",
+              "description": "Experience the vibrant cabaret show at the world-famous Moulin Rouge.",
+              "latitude": 48.8841,
+              "longitude": 2.3326,
+              "image": "moulin_rouge.jpg",
+              "notes": "Book tickets in advance for the best seating.",
+              "rating": 5
+            }
+          ]
+        },
+        {
+          "date": "2024-09-04",
+          "stops": [
+            {
+              "title": "Notre-Dame Cathedral",
+              "description": "Visit the Gothic masterpiece and climb the towers for a stunning view.",
+              "latitude": 48.853,
+              "longitude": 2.3499,
+              "image": "notre_dame.jpg",
+              "notes": "Check restoration status as the cathedral is undergoing repairs.",
+              "rating": 5
+            },
+            {
+              "title": "Luxembourg Gardens",
+              "description": "Relax in the beautiful Luxembourg Gardens, a perfect spot for a picnic.",
+              "latitude": 48.8462,
+              "longitude": 2.3372,
+              "image": "luxembourg_gardens.jpg",
+              "notes": "Ideal for a leisurely afternoon in a peaceful setting.",
+              "rating": 4
+            }
+          ]
+        }
+      ],
+      "hotel": {
+        "name": "Hotel Eiffel Seine",
+        "address": "3 Boulevard de Grenelle, 75015 Paris, France",
+        "latitude": 48.8556,
+        "longitude": 2.2938
+      },
+      "restaurants": [
+        {
+          "name": "Le Grand Véfour",
+          "type": "French",
+          "address": "17 Rue de Beaujolais, 75001 Paris, France",
+          "latitude": 48.865,
+          "longitude": 2.3371,
+          "rating": 4.8
+        },
+        {
+          "name": "Café Marly",
+          "type": "French",
+          "address": "93 Rue de Rivoli, 75001 Paris, France",
+          "latitude": 48.8613,
+          "longitude": 2.3345,
+          "rating": 4.3
+        }
+      ]
+    }
+  ]
+}
