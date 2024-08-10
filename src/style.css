@@ -4,8 +4,10 @@
 
 #app {
   height: 100vh;
+  border: 1px solid transparent;
 }
 
 .main-container {
-  min-height: calc(100% - 100px);
+  height: calc(100% - 120px);
+  overflow-x: auto;
 }
