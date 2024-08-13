@@ -9,7 +9,7 @@ export const useTripsStore = defineStore("trips", {
   actions: {
     loadTrips() {
       this.trips = tripsData.trips;
-      console.log("Trips loaded:", this.trips);
+      // console.log("Trips loaded:", this.trips);
     },
   },
 });

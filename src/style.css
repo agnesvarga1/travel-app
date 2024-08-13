@@ -11,3 +11,10 @@
   height: calc(100% - 120px);
   overflow-x: auto;
 }
+img {
+  display: block;
+}
+.thumb {
+  width: 80px;
+  aspect-ratio: 1;
+}

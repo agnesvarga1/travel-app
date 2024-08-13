@@ -16,7 +16,7 @@ onMounted(() => {
 <template>
   <div class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl">
     <h1 class="text-accent text-2xl font-semibold mt-2">Up coming Holiday</h1>
-    <TripCard v-for="(trip, index) in trips" :key="index" :trip="trip" />
+    <TripCard v-for="trip in trips" :key="trip.id" :trip="trip" />
   </div>
 </template>
 
