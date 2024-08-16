@@ -102,12 +102,14 @@
           ]
         }
       ],
-      "hotel": {
-        "name": "Hotel Eiffel Seine",
-        "address": "3 Boulevard de Grenelle, 75015 Paris, France",
-        "latitude": 48.8556,
-        "longitude": 2.2938
-      },
+      "hotels": [
+        {
+          "name": "Hotel Eiffel Seine",
+          "address": "3 Boulevard de Grenelle, 75015 Paris, France",
+          "latitude": 48.8556,
+          "longitude": 2.2938
+        }
+      ],
       "restaurants": [
         {
           "name": "Le Grand Véfour",

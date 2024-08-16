@@ -11,11 +11,24 @@ import {
   faPlus,
   faUser,
   faBars,
+  faMapLocationDot,
+  faMapMarkerAlt,
+  faUtensils,
+  faHotel,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-library.add(faHome, faPlus, faUser, faBars);
+library.add(
+  faHome,
+  faPlus,
+  faUser,
+  faBars,
+  faMapLocationDot,
+  faMapMarkerAlt,
+  faUtensils,
+  faHotel
+);
 const pinia = createPinia();
 createApp(App)
   .component("font-awesome-icon", FontAwesomeIcon)
