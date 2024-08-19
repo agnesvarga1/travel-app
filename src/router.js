@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router"; //webhistory salva 
 import AppHome from "./pages/AppHome.vue";
 import AppAddTrip from "./pages/AppAddTrip.vue";
 import TripDetails from "./pages/TripDetails.vue";
+import AllTrips from "./pages/AllTrips.vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -20,6 +21,11 @@ const router = createRouter({
       path: "/trip/:id",
       name: "TripDetails",
       component: TripDetails,
+    },
+    {
+      path: "/all",
+      name: "all",
+      component: AllTrips,
     },
   ],
 });

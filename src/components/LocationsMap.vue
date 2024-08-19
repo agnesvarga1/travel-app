@@ -3,7 +3,6 @@ import { onMounted, onUpdated, computed } from "vue";
 import L from "leaflet";
 import PrimaryBtn from "./PrimaryBtn.vue";
 import { useTripsStore } from "../stores/trips";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const tripsStore = useTripsStore();
 
@@ -101,9 +100,9 @@ onUpdated(() => {
   >
     <div class="modal-container rounded-lg" style="width: 80%; height: 80%">
       <PrimaryBtn
-        class="close-button absolute top-2 right-2"
+        class="close-button absolute top-2 right-2 font-body text-xl"
         @click="$emit('close')"
-        >Close</PrimaryBtn
+        >X</PrimaryBtn
       >
       <div id="map" class="map-container w-full h-full"></div>
     </div>
