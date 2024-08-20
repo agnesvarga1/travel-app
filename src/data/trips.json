@@ -19,7 +19,8 @@
               "longitude": 2.2945,
               "image": "eiffel_tower.jpg",
               "notes": "Consider visiting early in the morning to avoid long queues.",
-              "rating": 5
+              "rating": 5,
+              "visited": false
             },
             {
               "title": "Champs-Élysées",
@@ -28,7 +29,8 @@
               "longitude": 2.3115,
               "image": "champs_elysees.jpg",
               "notes": "Great place for a leisurely walk and some shopping.",
-              "rating": 4
+              "rating": 4,
+              "visited": false
             }
           ]
         },
@@ -42,7 +44,8 @@
               "longitude": 2.3376,
               "image": "louvre.jpg",
               "notes": "Plan at least half a day to explore the museum's vast collections.",
-              "rating": 5
+              "rating": 5,
+              "visited": false
             },
             {
               "title": "Seine River Cruise",
@@ -51,7 +54,8 @@
               "longitude": 2.3522,
               "image": "seine_cruise.jpg",
               "notes": "Evening cruises offer beautiful views of the city illuminated.",
-              "rating": 5
+              "rating": 5,
+              "visited": false
             }
           ]
         },
@@ -65,7 +69,8 @@
               "longitude": 2.3431,
               "image": "montmartre.jpg",
               "notes": "Walk up the steps for a great view of Paris.",
-              "rating": 4
+              "rating": 4,
+              "visited": false
             },
             {
               "title": "Moulin Rouge",
@@ -74,7 +79,8 @@
               "longitude": 2.3326,
               "image": "moulin_rouge.jpg",
               "notes": "Book tickets in advance for the best seating.",
-              "rating": 5
+              "rating": 5,
+              "visited": false
             }
           ]
         },
@@ -88,7 +94,8 @@
               "longitude": 2.3499,
               "image": "notre_dame.jpg",
               "notes": "Check restoration status as the cathedral is undergoing repairs.",
-              "rating": 5
+              "rating": 5,
+              "visited": false
             },
             {
               "title": "Luxembourg Gardens",
@@ -97,7 +104,8 @@
               "longitude": 2.3372,
               "image": "luxembourg_gardens.jpg",
               "notes": "Ideal for a leisurely afternoon in a peaceful setting.",
-              "rating": 4
+              "rating": 4,
+              "visited": false
             }
           ]
         }
