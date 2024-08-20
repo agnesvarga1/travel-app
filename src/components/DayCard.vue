@@ -1,7 +1,9 @@
 <script setup></script>
 
 <template class="font-body">
-  <div class="flex text-dark font-body mt-2 shadow-xl rounded-md p-1">
+  <div
+    class="flex text-dark font-body mt-2 shadow-xl rounded-md overflow-hidden"
+  >
     <figure class="thumb flex justify-center item-center">
       <slot name="header"> </slot>
     </figure>

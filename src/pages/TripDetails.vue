@@ -1,9 +1,10 @@
 <script setup>
 import { useRoute } from "vue-router";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useTripsStore } from "../stores/trips";
 import PrimaryBtn from "../components/PrimaryBtn.vue";
 import DayCard from "../components/DayCard.vue";
+import RouteMap from "../components/RouteMap.vue";
 const route = useRoute();
 const tripsStore = useTripsStore();
 const tripId = computed(() => route.params.id);
@@ -12,22 +13,36 @@ const trip = computed(() =>
   tripsStore.allTrips.find((trip) => trip.id === parseInt(tripId.value))
 );
 
+let isModal = ref(false);
+const selectedDayStops = ref([]);
+const selectedHotel = ref(null);
+
 onMounted(() => {
   // Optional: Load trips if not already loaded
   if (!trip.value) {
     tripsStore.loadTrips();
   }
 });
+
+const openMap = (day) => {
+  selectedDayStops.value = day.stops.map((stop) => ({
+    title: stop.title,
+    latitude: stop.latitude,
+    longitude: stop.longitude,
+  }));
+  selectedHotel.value = trip.value.hotels[0]; // Assuming there's only one hotel for simplicity
+  isModal.value = true;
+};
 </script>
 
 <template>
   <div class="bg-light rounded-t-lg mt-14 p-3 main-container">
     <div v-if="trip">
       <div class="flex">
-        <figure class="thumb">
+        <figure class="w-24">
           <img :src="`/images/${trip.cover}`" alt="cover image" />
         </figure>
-        <div class="text-xs ps-2">
+        <div class="text-xs ps-2 text-dark font-body">
           <h1 class="text-accent text-xl font-semibold font-heading">
             {{ trip.title }}
           </h1>
@@ -54,7 +69,7 @@ onMounted(() => {
             ></PrimaryBtn>
           </div>
           <!-- If No notes -->
-          <p class="text-dark font-body mt-2 shadow-xl rounded-md p-2" v-else>
+          <p class="text-dark font-body mt-2" v-else>
             <strong>Add Notes:</strong>
             <PrimaryBtn class="text-xl ms-2"
               ><i class="fa-solid fa-pencil"></i
@@ -65,18 +80,31 @@ onMounted(() => {
       <!-- Stops -->
       <h2 class="font-heading text-dark" v-if="trip.days">Stops:</h2>
       <div class="mt-2" v-for="(day, i) in trip.days" key="day.date">
-        <h1>Day {{ i + 1 }} date:{{ day.date }}</h1>
-        <DayCard v-for="stop in day.stops">
+        <h1 class="font-heading text-dark flex justify-between">
+          Day {{ i + 1 }}
+          <div @click="openMap(day)">
+            <font-awesome-icon
+              class="bg-primary rounded-md p-2 text-xl text-light hover:bg-dark cursor-pointer"
+              :icon="['fas', 'map-location-dot']"
+            />
+          </div>
+        </h1>
+        <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
+        <DayCard v-for="stop in day.stops" class="relative">
           <template v-slot:header>
             <img :src="`/images/${stop.image}`" alt="" />
           </template>
           <template v-slot:body>
-            <div class="ps-2 font-body text-dark">
-              <h3 class="font-heading text-primary text-xl">
+            <div class="ps-2 font-body text-dark p-1">
+              <h3 class="font-heading text-secondary text-l">
                 {{ stop.title }}
               </h3>
               <p class="text-dark font-body text-xs">
                 {{ stop.description }}
+              </p>
+              <p class="text-dark font-body text-xs mt-1">
+                <strong>Notes:</strong>
+                {{ stop.notes }}
               </p>
             </div>
           </template>
@@ -93,8 +121,8 @@ onMounted(() => {
           </svg>
         </template>
         <template v-slot:body>
-          <div class="ps-2 font-body text-dark">
-            <h3 class="font-heading text-primary text-xl">{{ hotel.name }}</h3>
+          <div class="ps-2 font-body text-dark p-1">
+            <h3 class="font-heading text-secondary xt-l">{{ hotel.name }}</h3>
             <p class="text-xs">
               <i class="fa-solid fa-map-pin"></i> {{ hotel.address }}
             </p>
@@ -114,8 +142,8 @@ onMounted(() => {
           </svg>
         </template>
         <template v-slot:body>
-          <div class="ps-2 font-body text-dark">
-            <h3 class="font-heading text-primary text-xl">{{ risto.name }}</h3>
+          <div class="ps-2 font-body text-dark p-1">
+            <h3 class="font-heading text-secondary text-l">{{ risto.name }}</h3>
             <p class="text-xs">
               <i class="fa-solid fa-map-pin"></i> {{ risto.address }}
             </p>
@@ -129,6 +157,13 @@ onMounted(() => {
         </template>
       </DayCard>
     </div>
+
+    <RouteMap
+      v-if="isModal"
+      :stops="selectedDayStops"
+      :hotel="selectedHotel"
+      @close="isModal = false"
+    />
   </div>
 </template>
 
