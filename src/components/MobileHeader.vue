@@ -26,4 +26,7 @@ import { RouterLink } from "vue-router";
 .logo h1 {
   color: #583d72;
 }
+svg {
+  fill: #583d72;
+}
 </style>
