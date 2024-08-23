@@ -2,6 +2,7 @@
 import { onMounted, watch, ref } from "vue";
 import L from "leaflet";
 import PrimaryBtn from "./PrimaryBtn.vue";
+import { useIconsStore } from "../stores/icons"; // Import the icons store
 // Props
 const props = defineProps({
   stops: Array,
@@ -9,47 +10,42 @@ const props = defineProps({
 });
 
 let map;
+const iconsStore = useIconsStore(); // Initialize the icons store
 
-// create a red polyline from an array of LatLng points
+// create a polyline from an array of LatLng points
 const latlngs = [];
 
 // Example for stop marker
-const stopIcon = L.divIcon({
-  html: '<i class="fas fa-map-marker-alt" style="color: #FF8474; font-size: 24px;"></i>',
-  className: "custom-marker",
-  iconSize: [30, 42],
-  iconAnchor: [15, 42],
-  popupAnchor: [0, -42],
-});
-
-// Example for hotel marker
-const hotelIcon = L.divIcon({
-  html: '<i class="fas fa-hotel" style="color: #583D72; font-size: 24px;"></i>',
-  className: "custom-marker",
-  iconSize: [30, 42],
-  iconAnchor: [15, 42],
-  popupAnchor: [0, -42],
-});
 
 const initializeMap = () => {
-  map = L.map("map", {
-    center: [props.hotel.latitude, props.hotel.longitude], //@hotel
-    zoom: 12,
-  });
-  latlngs.push([props.hotel.latitude, props.hotel.longitude]);
+  if (props.hotel === null) {
+    map = L.map("map", {
+      center: [props.stops[0].latitude, props.stops[0].longitude], //@1stStop
+      zoom: 12,
+    });
+    latlngs.push([props.stops[0].latitude, props.stops[0].longitude]);
+  } else {
+    map = L.map("map", {
+      center: [props.hotel.latitude, props.hotel.longitude], //@hotel
+      zoom: 12,
+    });
+    latlngs.push([props.hotel.latitude, props.hotel.longitude]);
+  }
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
   }).addTo(map);
 
-  L.marker([props.hotel.latitude, props.hotel.longitude], { icon: hotelIcon })
+  L.marker([props.hotel.latitude, props.hotel.longitude], {
+    icon: iconsStore.getHotelIcon,
+  })
     .addTo(map)
     .bindPopup(`<b>${props.hotel.name}</b>`);
 
   // To ensure map renders correctly
   map.invalidateSize();
   props.stops.forEach((stop) => {
-    L.marker([stop.latitude, stop.longitude], { icon: stopIcon })
+    L.marker([stop.latitude, stop.longitude], { icon: iconsStore.getStopIcon })
       .addTo(map)
       .bindPopup(`<b>${stop.title}</b>`);
     latlngs.push([stop.latitude, stop.longitude]);

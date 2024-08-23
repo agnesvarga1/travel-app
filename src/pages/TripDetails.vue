@@ -5,6 +5,7 @@ import { useTripsStore } from "../stores/trips";
 import PrimaryBtn from "../components/PrimaryBtn.vue";
 import DayCard from "../components/DayCard.vue";
 import RouteMap from "../components/RouteMap.vue";
+import moment from "moment";
 const route = useRoute();
 const tripsStore = useTripsStore();
 const tripId = computed(() => route.params.id);
@@ -16,6 +17,7 @@ const trip = computed(() =>
 let isModal = ref(false);
 const selectedDayStops = ref([]);
 const selectedHotel = ref(null);
+const selectedStop = ref(null);
 
 onMounted(() => {
   // Optional: Load trips if not already loaded
@@ -30,9 +32,24 @@ const openMap = (day) => {
     latitude: stop.latitude,
     longitude: stop.longitude,
   }));
-  selectedHotel.value = trip.value.hotels[0]; // Assuming there's only one hotel for simplicity
+  // Ensure that the hotels array exists and is not empty
+  if (trip.value.hotels && trip.value.hotels.length > 0) {
+    // Convert startDate and checkIn dates to comparable formats
+    const dayDate = moment(day.date); // Convert day.date to a Moment.js object
+
+    selectedHotel.value = trip.value.hotels.find((hotel) => {
+      const checkInDate = moment(hotel.checkIn);
+      const checkOutDate = moment(hotel.checkOut);
+      // Check if the day's date falls between the check-in and check-out dates (inclusive)
+      return dayDate.isBetween(checkInDate, checkOutDate, "days", "[]");
+    });
+  } else {
+    selectedHotel.value = null;
+  }
   isModal.value = true;
 };
+
+const checkVisited = (stop) => {};
 </script>
 
 <template>
@@ -65,8 +82,8 @@ const openMap = (day) => {
               {{ trip.notes }}
             </p>
             <PrimaryBtn class="text-xl"
-              ><i class="fa-solid fa-pencil"></i
-            ></PrimaryBtn>
+              ><i class="fa-solid fa-pencil"></i>
+            </PrimaryBtn>
           </div>
           <!-- If No notes -->
           <p class="text-dark font-body mt-2" v-else>
@@ -92,10 +109,19 @@ const openMap = (day) => {
         <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
         <DayCard v-for="stop in day.stops" class="relative">
           <template v-slot:header>
-            <img :src="`/images/${stop.image}`" alt="" />
+            <svg
+              id="visited-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+            >
+              <path
+                d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+              />
+            </svg>
+            <img :src="`/images/${day.image}`" :alt="trip.title" />
           </template>
           <template v-slot:body>
-            <div class="ps-2 font-body text-dark p-1">
+            <div class="ps-2 font-body text-dark">
               <h3 class="font-heading text-secondary text-l">
                 {{ stop.title }}
               </h3>
@@ -126,6 +152,8 @@ const openMap = (day) => {
             <p class="text-xs">
               <i class="fa-solid fa-map-pin"></i> {{ hotel.address }}
             </p>
+            <p class="text-xs">Check-In Date: {{ hotel.checkIn }}</p>
+            <p class="text-xs">Check-Out Date: {{ hotel.checkOut }}</p>
           </div>
         </template>
       </DayCard>
@@ -135,14 +163,18 @@ const openMap = (day) => {
         v-for="(risto, index) in trip.restaurants"
       >
         <template v-slot:header>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <svg
+            class="cursor-pointer"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"
+          >
             <path
               d="M416 0C400 0 288 32 288 176l0 112c0 35.3 28.7 64 64 64l32 0 0 128c0 17.7 14.3 32 32 32s32-14.3 32-32l0-128 0-112 0-208c0-17.7-14.3-32-32-32zM64 16C64 7.8 57.9 1 49.7 .1S34.2 4.6 32.4 12.5L2.1 148.8C.7 155.1 0 161.5 0 167.9c0 45.9 35.1 83.6 80 87.7L80 480c0 17.7 14.3 32 32 32s32-14.3 32-32l0-224.4c44.9-4.1 80-41.8 80-87.7c0-6.4-.7-12.8-2.1-19.1L191.6 12.5c-1.8-8-9.3-13.3-17.4-12.4S160 7.8 160 16l0 134.2c0 5.4-4.4 9.8-9.8 9.8c-5.1 0-9.3-3.9-9.8-9L127.9 14.6C127.2 6.3 120.3 0 112 0s-15.2 6.3-15.9 14.6L83.7 151c-.5 5.1-4.7 9-9.8 9c-5.4 0-9.8-4.4-9.8-9.8L64 16zm48.3 152l-.3 0-.3 0 .3-.7 .3 .7z"
             />
           </svg>
         </template>
         <template v-slot:body>
-          <div class="ps-2 font-body text-dark p-1">
+          <div class="ps-2 font-body text-dark pt-2 p-1">
             <h3 class="font-heading text-secondary text-l">{{ risto.name }}</h3>
             <p class="text-xs">
               <i class="fa-solid fa-map-pin"></i> {{ risto.address }}
@@ -172,5 +204,12 @@ svg {
   fill: #583d72;
   width: 55px;
   margin: 0 auto;
+}
+#visited-icon {
+  width: 20px;
+  fill: gray;
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
 }
 </style>

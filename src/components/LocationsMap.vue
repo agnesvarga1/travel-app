@@ -3,72 +3,60 @@ import { onMounted, onUpdated, computed } from "vue";
 import L from "leaflet";
 import PrimaryBtn from "./PrimaryBtn.vue";
 import { useTripsStore } from "../stores/trips";
+import { useIconsStore } from "../stores/icons";
 
 const tripsStore = useTripsStore();
+const iconsStore = useIconsStore();
 
-// Example for stop marker
-const stopIcon = L.divIcon({
-  html: '<i class="fas fa-map-marker-alt" style="color: #FF8474; font-size: 24px;"></i>',
-  className: "custom-marker",
-  iconSize: [30, 42],
-  iconAnchor: [15, 42],
-  popupAnchor: [0, -42],
+const props = defineProps({
+  id: Number,
 });
-
-// Example for restaurant marker
-const restaurantIcon = L.divIcon({
-  html: '<i class="fas fa-utensils" style="color: #9F5F80; font-size: 24px;"></i>',
-  className: "custom-marker",
-  iconSize: [30, 42],
-  iconAnchor: [15, 42],
-  popupAnchor: [0, -42],
-});
-
-// Example for hotel marker
-const hotelIcon = L.divIcon({
-  html: '<i class="fas fa-hotel" style="color: #583D72; font-size: 24px;"></i>',
-  className: "custom-marker",
-  iconSize: [30, 42],
-  iconAnchor: [15, 42],
-  popupAnchor: [0, -42],
-});
-
 const trips = computed(() => tripsStore.allTrips);
+const currTrip = computed(() =>
+  trips.value.find((trip) => trip.id === props.id)
+);
+
 let map;
 const getMarkers = () => {
   //console.log(trips.value);
-  trips.value.forEach((trip) => {
-    trip.days.forEach((day) => {
-      day.stops.forEach((stop) => {
-        L.marker([stop.latitude, stop.longitude], { icon: stopIcon })
-          .addTo(map)
-          .bindPopup(`<b>${stop.title}</b>`);
-      });
-    });
-    if (trip.hotels) {
-      trip.hotels.forEach((hotel) => {
-        //console.log(hotel);
-        L.marker([hotel.latitude, hotel.longitude], { icon: hotelIcon })
-          .addTo(map)
-          .bindPopup(`<b>${hotel.name}</b>`)
-          .openPopup();
-      });
-    }
 
-    trip.restaurants.forEach((restaurant) => {
-      L.marker([restaurant.latitude, restaurant.longitude], {
-        icon: restaurantIcon,
+  currTrip.value.days.forEach((day) => {
+    day.stops.forEach((stop) => {
+      L.marker([stop.latitude, stop.longitude], {
+        icon: iconsStore.getStopIcon,
       })
         .addTo(map)
-        .bindPopup(`<b>${restaurant.name}</b>`);
+        .bindPopup(`<b>${stop.title}</b>`);
     });
+  });
+  if (currTrip.value.hotels) {
+    currTrip.value.hotels.forEach((hotel) => {
+      //console.log(hotel);
+      L.marker([hotel.latitude, hotel.longitude], {
+        icon: iconsStore.getHotelIcon,
+      })
+        .addTo(map)
+        .bindPopup(`<b>${hotel.name}</b>`)
+        .openPopup();
+    });
+  }
+
+  currTrip.value.restaurants.forEach((restaurant) => {
+    L.marker([restaurant.latitude, restaurant.longitude], {
+      icon: iconsStore.getRestaurantIcon,
+    })
+      .addTo(map)
+      .bindPopup(`<b>${restaurant.name}</b>`);
   });
 };
 
 const initializeMap = () => {
   map = L.map("map", {
-    center: [48.8566, 2.3522], // Paris
-    zoom: 12,
+    center: [
+      currTrip.value.days[0].stops[0].latitude,
+      currTrip.value.days[0].stops[0].longitude,
+    ],
+    zoom: 10,
   });
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -86,9 +74,7 @@ onMounted(() => {
 });
 
 onUpdated(() => {
-  const mapContainer = document.getElementById("map");
-  if (mapContainer) {
-    const map = L.map(mapContainer);
+  if (map) {
     map.invalidateSize(); // Ensure map resizes correctly
   }
 });

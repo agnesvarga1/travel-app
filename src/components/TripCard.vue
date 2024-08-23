@@ -13,7 +13,7 @@ let isModal = ref(false);
     class="trip-card w-80 mx-auto shadow-lg mt-3 rounded-lg overflow-hidden realtive"
   >
     <div class="card-header">
-      <img :src="`/images/${trip.cover}`" alt="" />
+      <img :src="`/images/${trip.cover}`" :alt="trip.title" />
     </div>
     <div class="card-body p-2">
       <div class="flex justify-between">
@@ -32,7 +32,7 @@ let isModal = ref(false);
       </div>
 
       <p class="text-sm font-body leading-5">{{ trip.description }}</p>
-      <LocationsMap v-if="isModal" @close="isModal = false" />
+      <LocationsMap v-if="isModal" @close="isModal = false" :id="trip.id" />
     </div>
     <div class="card-footer p-3 flex justify-center">
       <PrimaryBtn class="w-full">

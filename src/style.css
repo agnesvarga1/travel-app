@@ -15,5 +15,5 @@ img {
   display: block;
 }
 .thumb {
-  width: 200px;
+  max-width: 120px;
 }
