@@ -11,7 +11,7 @@
       "days": [
         {
           "date": "2024-09-01",
-          "image": "eiffel_tower.jpg",
+
           "stops": [
             {
               "title": "Eiffel Tower",
@@ -20,7 +20,7 @@
               "longitude": 2.2945,
 
               "notes": "Consider visiting early in the morning to avoid long queues.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -30,14 +30,14 @@
               "longitude": 2.3115,
 
               "notes": "Great place for a leisurely walk and some shopping.",
-              "rating": 4,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-09-02",
-          "image": "seine_cruise.jpg",
+
           "stops": [
             {
               "title": "Louvre Museum",
@@ -46,7 +46,7 @@
               "longitude": 2.3376,
 
               "notes": "Plan at least half a day to explore the museum's vast collections.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -56,7 +56,7 @@
               "longitude": 2.3522,
 
               "notes": "Evening cruises offer beautiful views of the city illuminated.",
-              "rating": 5,
+
               "visited": false
             }
           ]
@@ -72,7 +72,7 @@
               "longitude": 2.3431,
 
               "notes": "Walk up the steps for a great view of Paris.",
-              "rating": 4,
+
               "visited": false
             },
             {
@@ -82,14 +82,14 @@
               "longitude": 2.3326,
 
               "notes": "Book tickets in advance for the best seating.",
-              "rating": 5,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-09-04",
-          "image": "notre_dame.jpg",
+
           "stops": [
             {
               "title": "Notre-Dame Cathedral",
@@ -98,7 +98,7 @@
               "longitude": 2.3499,
 
               "notes": "Check restoration status as the cathedral is undergoing repairs.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -108,7 +108,7 @@
               "longitude": 2.3372,
 
               "notes": "Ideal for a leisurely afternoon in a peaceful setting.",
-              "rating": 4,
+
               "visited": false
             }
           ]
@@ -130,16 +130,14 @@
           "type": "French",
           "address": "17 Rue de Beaujolais, 75001 Paris, France",
           "latitude": 48.865,
-          "longitude": 2.3371,
-          "rating": 4.8
+          "longitude": 2.3371
         },
         {
           "name": "Café Marly",
           "type": "French",
           "address": "93 Rue de Rivoli, 75001 Paris, France",
           "latitude": 48.8613,
-          "longitude": 2.3345,
-          "rating": 4.3
+          "longitude": 2.3345
         }
       ]
     },
@@ -154,7 +152,7 @@
       "days": [
         {
           "date": "2024-08-20",
-          "image": "rome.jpg",
+          "image": "",
           "stops": [
             {
               "title": "Colosseum",
@@ -163,8 +161,8 @@
               "longitude": 12.4922,
 
               "notes": "Arrive early to avoid crowds.",
-              "rating": 5,
-              "visited": false
+
+              "visited": true
             },
             {
               "title": "Roman Forum",
@@ -173,14 +171,14 @@
               "longitude": 12.4853,
 
               "notes": "Consider a guided tour to fully appreciate the history.",
-              "rating": 5,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-21",
-          "image": "rome.jpg",
+
           "stops": [
             {
               "title": "Vatican Museums",
@@ -189,7 +187,7 @@
               "longitude": 12.4536,
 
               "notes": "Book tickets in advance to skip the line.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -199,14 +197,14 @@
               "longitude": 12.4534,
 
               "notes": "Climb to the top of the dome for an amazing view of Rome.",
-              "rating": 5,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-22",
-          "image": "rome.jpg",
+
           "stops": [
             {
               "title": "Pantheon",
@@ -215,7 +213,7 @@
               "longitude": 12.4768,
 
               "notes": "The Pantheon is free to enter, but check opening hours.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -225,14 +223,14 @@
               "longitude": 12.4731,
 
               "notes": "Great place to enjoy a coffee or gelato.",
-              "rating": 4,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-23",
-          "image": "florence.jpg",
+
           "stops": [
             {
               "title": "Florence - Duomo",
@@ -241,7 +239,7 @@
               "longitude": 11.2558,
 
               "notes": "Climb to the top for a breathtaking view of the city.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -251,14 +249,14 @@
               "longitude": 11.2552,
 
               "notes": "Book tickets in advance to avoid the long lines.",
-              "rating": 5,
-              "visited": false
+
+              "visited": true
             }
           ]
         },
         {
           "date": "2024-08-24",
-          "image": "florence.jpg",
+
           "stops": [
             {
               "title": "Ponte Vecchio",
@@ -267,8 +265,8 @@
               "longitude": 11.2531,
 
               "notes": "The bridge is especially beautiful at sunset.",
-              "rating": 4,
-              "visited": false
+
+              "visited": true
             },
             {
               "title": "Pitti Palace & Boboli Gardens",
@@ -277,14 +275,14 @@
               "longitude": 11.2507,
 
               "notes": "The gardens offer a peaceful retreat from the city.",
-              "rating": 5,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-25",
-          "image": "venice.jpg",
+
           "stops": [
             {
               "title": "Venice - St. Mark's Basilica",
@@ -293,7 +291,7 @@
               "longitude": 12.3399,
 
               "notes": "Dress modestly to enter the basilica.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -303,7 +301,7 @@
               "longitude": 12.3396,
 
               "notes": "Don't miss the Bridge of Sighs.",
-              "rating": 5,
+
               "visited": false
             }
           ]
@@ -319,7 +317,7 @@
               "longitude": 12.3155,
 
               "notes": "Gondola rides can be expensive, so consider a group ride.",
-              "rating": 4,
+
               "visited": false
             },
             {
@@ -329,14 +327,14 @@
               "longitude": 12.335,
 
               "notes": "A popular spot for photos, but be prepared for crowds.",
-              "rating": 4,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-27",
-          "image": "milan.jpg",
+
           "stops": [
             {
               "title": "Milan - The Last Supper",
@@ -345,7 +343,7 @@
               "longitude": 9.1705,
 
               "notes": "Booking in advance is essential.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -355,14 +353,14 @@
               "longitude": 9.1916,
 
               "notes": "Climb to the rooftop for panoramic views of the city.",
-              "rating": 5,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-28",
-          "image": "milan.jpg",
+
           "stops": [
             {
               "title": "Galleria Vittorio Emanuele II",
@@ -371,7 +369,7 @@
               "longitude": 9.191,
               "image": "galleria_vittorio_emanuele.jpg",
               "notes": "A great place to enjoy a coffee and people-watch.",
-              "rating": 4,
+
               "visited": false
             },
             {
@@ -381,14 +379,14 @@
               "longitude": 9.1793,
 
               "notes": "Don't miss the beautiful courtyards and gardens.",
-              "rating": 4,
+
               "visited": false
             }
           ]
         },
         {
           "date": "2024-08-29",
-          "image": "lake_como.jpg",
+
           "stops": [
             {
               "title": "Lake Como",
@@ -397,7 +395,7 @@
               "longitude": 9.2559,
 
               "notes": "Consider a boat tour to fully appreciate the beauty of the lake.",
-              "rating": 5,
+
               "visited": false
             },
             {
@@ -407,7 +405,7 @@
               "longitude": 9.2618,
               "image": "bellagio.jpg",
               "notes": "Enjoy a leisurely walk through the narrow streets and lakeside views.",
-              "rating": 5,
+
               "visited": false
             }
           ]
@@ -453,32 +451,28 @@
           "type": "Italian",
           "address": "Via Labicana, 125, 00184 Roma RM, Italy",
           "latitude": 41.8902,
-          "longitude": 12.495,
-          "rating": 4.9
+          "longitude": 12.495
         },
         {
           "name": "Trattoria 4 Leoni",
           "type": "Italian",
           "address": "Via de' Vellutini, 1r, 50125 Firenze FI, Italy",
           "latitude": 43.7684,
-          "longitude": 11.2495,
-          "rating": 4.5
+          "longitude": 11.2495
         },
         {
           "name": "Osteria alle Testiere",
           "type": "Seafood",
           "address": "Calle del Mondo Novo, 5801, 30122 Venezia VE, Italy",
           "latitude": 45.4352,
-          "longitude": 12.3412,
-          "rating": 4.7
+          "longitude": 12.3412
         },
         {
           "name": "Ristorante Cracco",
           "type": "Italian",
           "address": "Galleria Vittorio Emanuele II, Milan, Italy",
           "latitude": 45.4659,
-          "longitude": 9.191,
-          "rating": 4.8
+          "longitude": 9.191
         }
       ]
     }

@@ -21,7 +21,7 @@ const initializeMap = () => {
   if (props.hotel === null) {
     map = L.map("map", {
       center: [props.stops[0].latitude, props.stops[0].longitude], //@1stStop
-      zoom: 12,
+      zoom: 11,
     });
     latlngs.push([props.stops[0].latitude, props.stops[0].longitude]);
   } else {

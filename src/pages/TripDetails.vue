@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute } from "vue-router";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, reactive, watch } from "vue";
 import { useTripsStore } from "../stores/trips";
 import PrimaryBtn from "../components/PrimaryBtn.vue";
 import DayCard from "../components/DayCard.vue";
@@ -13,18 +13,18 @@ const tripId = computed(() => route.params.id);
 const trip = computed(() =>
   tripsStore.allTrips.find((trip) => trip.id === parseInt(tripId.value))
 );
-
 let isModal = ref(false);
 const selectedDayStops = ref([]);
 const selectedHotel = ref(null);
-const selectedStop = ref(null);
 
 onMounted(() => {
-  // Optional: Load trips if not already loaded
-  if (!trip.value) {
-    tripsStore.loadTrips();
-  }
+  tripsStore.loadTrips();
 });
+
+// Function to toggle visited status of stops and save to local storage
+const checkVisited = (stop) => {
+  stop.visited = !stop.visited;
+};
 
 const openMap = (day) => {
   selectedDayStops.value = day.stops.map((stop) => ({
@@ -32,9 +32,11 @@ const openMap = (day) => {
     latitude: stop.latitude,
     longitude: stop.longitude,
   }));
+
   // Ensure that the hotels array exists and is not empty
   if (trip.value.hotels && trip.value.hotels.length > 0) {
     // Convert startDate and checkIn dates to comparable formats
+
     const dayDate = moment(day.date); // Convert day.date to a Moment.js object
 
     selectedHotel.value = trip.value.hotels.find((hotel) => {
@@ -48,8 +50,6 @@ const openMap = (day) => {
   }
   isModal.value = true;
 };
-
-const checkVisited = (stop) => {};
 </script>
 
 <template>
@@ -59,7 +59,7 @@ const checkVisited = (stop) => {};
         <figure class="w-24">
           <img :src="`/images/${trip.cover}`" alt="cover image" />
         </figure>
-        <div class="text-xs ps-2 text-dark font-body">
+        <div class="text-xs p-3 pt-1 text-dark font-body">
           <h1 class="text-accent text-xl font-semibold font-heading">
             {{ trip.title }}
           </h1>
@@ -96,9 +96,9 @@ const checkVisited = (stop) => {};
       </div>
       <!-- Stops -->
       <h2 class="font-heading text-dark" v-if="trip.days">Stops:</h2>
-      <div class="mt-2" v-for="(day, i) in trip.days" key="day.date">
-        <h1 class="font-heading text-dark flex justify-between">
-          Day {{ i + 1 }}
+      <div class="mt-2" v-for="(day, dayIndex) in trip.days" :key="dayIndex">
+        <h1 class="font-heading text-dark flex justify-between text-lg">
+          Day {{ dayIndex + 1 }}
           <div @click="openMap(day)">
             <font-awesome-icon
               class="bg-primary rounded-md p-2 text-xl text-light hover:bg-dark cursor-pointer"
@@ -107,10 +107,16 @@ const checkVisited = (stop) => {};
           </div>
         </h1>
         <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
-        <DayCard v-for="stop in day.stops" class="relative">
+        <DayCard
+          v-for="(stop, stopIndex) in day.stops"
+          class="relative"
+          :key="stopIndex"
+        >
           <template v-slot:header>
             <svg
+              @click="checkVisited(stop)"
               id="visited-icon"
+              :class="{ active: stop.visited }"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
             >
@@ -118,11 +124,20 @@ const checkVisited = (stop) => {};
                 d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
               />
             </svg>
-            <img :src="`/images/${day.image}`" :alt="trip.title" />
+
+            <svg
+              class="fill-dark"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+            >
+              <path
+                d="M240.1 4.2c9.8-5.6 21.9-5.6 31.8 0l171.8 98.1L448 104l0 .9 47.9 27.4c12.6 7.2 18.8 22 15.1 36s-16.4 23.8-30.9 23.8L32 192c-14.5 0-27.2-9.8-30.9-23.8s2.5-28.8 15.1-36L64 104.9l0-.9 4.4-1.6L240.1 4.2zM64 224l64 0 0 192 40 0 0-192 64 0 0 192 48 0 0-192 64 0 0 192 40 0 0-192 64 0 0 196.3c.6 .3 1.2 .7 1.8 1.1l48 32c11.7 7.8 17 22.4 12.9 35.9S494.1 512 480 512L32 512c-14.1 0-26.5-9.2-30.6-22.7s1.1-28.1 12.9-35.9l48-32c.6-.4 1.2-.7 1.8-1.1L64 224z"
+              />
+            </svg>
           </template>
           <template v-slot:body>
-            <div class="ps-2 font-body text-dark">
-              <h3 class="font-heading text-secondary text-l">
+            <div class="p-2 font-body text-dark">
+              <h3 class="font-heading text-secondary text-sm">
                 {{ stop.title }}
               </h3>
               <p class="text-dark font-body text-xs">
@@ -137,7 +152,7 @@ const checkVisited = (stop) => {};
         </DayCard>
       </div>
       <!-- Hotels and Ristos -->
-      <h2 class="font-heading text-dark" v-if="trip.hotels">Hotels:</h2>
+      <h2 class="font-heading text-dark pt-2" v-if="trip.hotels">Hotels:</h2>
       <DayCard v-if="trip.hotels" v-for="hotel in trip.hotels">
         <template v-slot:header
           ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -147,7 +162,7 @@ const checkVisited = (stop) => {};
           </svg>
         </template>
         <template v-slot:body>
-          <div class="ps-2 font-body text-dark p-1">
+          <div class="font-body text-dark p-2">
             <h3 class="font-heading text-secondary xt-l">{{ hotel.name }}</h3>
             <p class="text-xs">
               <i class="fa-solid fa-map-pin"></i> {{ hotel.address }}
@@ -157,7 +172,7 @@ const checkVisited = (stop) => {};
           </div>
         </template>
       </DayCard>
-      <h2 class="font-heading text-dark" v-if="trip.restaurants">Eats:</h2>
+      <h2 class="font-heading text-dark pt-3" v-if="trip.restaurants">Eats:</h2>
       <DayCard
         v-if="trip.restaurants"
         v-for="(risto, index) in trip.restaurants"
@@ -174,7 +189,7 @@ const checkVisited = (stop) => {};
           </svg>
         </template>
         <template v-slot:body>
-          <div class="ps-2 font-body text-dark pt-2 p-1">
+          <div class="ps-2 font-body text-dark p-2">
             <h3 class="font-heading text-secondary text-l">{{ risto.name }}</h3>
             <p class="text-xs">
               <i class="fa-solid fa-map-pin"></i> {{ risto.address }}
@@ -206,10 +221,16 @@ svg {
   margin: 0 auto;
 }
 #visited-icon {
-  width: 20px;
+  width: 25px;
   fill: gray;
   position: absolute;
   top: 0.2rem;
   left: 0.2rem;
+}
+#visited-icon:hover {
+  transform: scale(1.2);
+}
+.active {
+  fill: #ff8474 !important;
 }
 </style>
