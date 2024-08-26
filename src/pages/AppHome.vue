@@ -4,6 +4,7 @@ import { onMounted, ref } from "vue";
 import TripCard from "../components/TripCard.vue";
 import { RouterLink, useRoute } from "vue-router";
 import moment from "moment";
+
 const route = useRoute();
 
 const isActive = (path) => {
