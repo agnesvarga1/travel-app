@@ -6,6 +6,8 @@ import PrimaryBtn from "../components/PrimaryBtn.vue";
 import DayCard from "../components/DayCard.vue";
 import RouteMap from "../components/RouteMap.vue";
 import moment from "moment";
+import { updateStopVisitedStatus } from "../utils/idbUtils";
+
 const route = useRoute();
 const tripsStore = useTripsStore();
 const tripId = computed(() => route.params.id);
@@ -16,14 +18,20 @@ const trip = computed(() =>
 let isModal = ref(false);
 const selectedDayStops = ref([]);
 const selectedHotel = ref(null);
+let isNoteModal = ref(false);
+let note = ref("");
 
 onMounted(() => {
   tripsStore.loadTrips();
 });
 
-// Function to toggle visited status of stops and save to local storage
-const checkVisited = (stop) => {
+// Function to toggle visited status of stops and save to indexedDB
+const checkVisited = (stop, tripId, dayIndex, stopIndex) => {
   stop.visited = !stop.visited;
+  tripId = Number(tripId);
+  console.log("dayIndexBefore: " + dayIndex);
+  console.log("stopIndexBefore: " + stopIndex);
+  updateStopVisitedStatus(tripId, stopIndex, dayIndex, stop.visited);
 };
 
 const openMap = (day) => {
@@ -33,22 +41,33 @@ const openMap = (day) => {
     longitude: stop.longitude,
   }));
 
-  // Ensure that the hotels array exists and is not empty
   if (trip.value.hotels && trip.value.hotels.length > 0) {
-    // Convert startDate and checkIn dates to comparable formats
-
     const dayDate = moment(day.date); // Convert day.date to a Moment.js object
 
     selectedHotel.value = trip.value.hotels.find((hotel) => {
       const checkInDate = moment(hotel.checkIn);
       const checkOutDate = moment(hotel.checkOut);
-      // Check if the day's date falls between the check-in and check-out dates (inclusive)
       return dayDate.isBetween(checkInDate, checkOutDate, "days", "[]");
     });
   } else {
     selectedHotel.value = null;
   }
   isModal.value = true;
+};
+
+watch(
+  () => isNoteModal.value,
+  (newVal) => {
+    if (newVal && trip.value) {
+      note.value = trip.value.notes || "";
+    }
+  }
+);
+
+const submitNote = (id, n) => {
+  id = Number(id);
+  tripsStore.updateTripNotes(id, n);
+  isNoteModal.value = false;
 };
 </script>
 
@@ -81,14 +100,14 @@ const openMap = (day) => {
               <strong>Notes:</strong> <br />
               {{ trip.notes }}
             </p>
-            <PrimaryBtn class="text-xl"
+            <PrimaryBtn @click="isNoteModal = true" class="text-xl"
               ><i class="fa-solid fa-pencil"></i>
             </PrimaryBtn>
           </div>
           <!-- If No notes -->
           <p class="text-dark font-body mt-2" v-else>
             <strong>Add Notes:</strong>
-            <PrimaryBtn class="text-xl ms-2"
+            <PrimaryBtn @click="isNoteModal = true" class="text-xl ms-2"
               ><i class="fa-solid fa-pencil"></i
             ></PrimaryBtn>
           </p>
@@ -114,7 +133,7 @@ const openMap = (day) => {
         >
           <template v-slot:header>
             <svg
-              @click="checkVisited(stop)"
+              @click="checkVisited(stop, tripId, stopIndex, dayIndex)"
               id="visited-icon"
               :class="{ active: stop.visited }"
               xmlns="http://www.w3.org/2000/svg"
@@ -204,7 +223,35 @@ const openMap = (day) => {
         </template>
       </DayCard>
     </div>
-
+    <!-- NOTE MODAL -->
+    <div
+      v-if="isNoteModal"
+      class="note-modal absolute top-10 w-full bg-white flex flex-col align-center p-3"
+    >
+      <h3 class="flex justify-between p-2 font-heading text-dark">
+        Add Note
+        <PrimaryBtn
+          class="close-button font-body text-xl"
+          @click="isNoteModal = false"
+          >X</PrimaryBtn
+        >
+      </h3>
+      <textarea
+        v-model="note"
+        class="w-full border-2 border-gray-300 rounded-md p-1 font-body"
+        cols="20"
+        rows="10"
+        :placeholder="trip.notes === '' ? 'example note' : ''"
+        >{{ trip.notes }}</textarea
+      >
+      <div>
+        <PrimaryBtn
+          class="mt-2 focus:outline-none focus:border-dark"
+          @click="submitNote(tripId, note)"
+          >Submit Note</PrimaryBtn
+        >
+      </div>
+    </div>
     <RouteMap
       v-if="isModal"
       :stops="selectedDayStops"

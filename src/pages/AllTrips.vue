@@ -2,11 +2,6 @@
 import { useTripsStore } from "../stores/trips";
 import { onMounted, ref } from "vue";
 import TripCard from "../components/TripCard.vue";
-import { RouterLink, useRoute } from "vue-router";
-
-const isActive = (path) => {
-  return route.path === path;
-};
 
 const tripsStore = useTripsStore();
 const trips = tripsStore.allTrips;

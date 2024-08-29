@@ -29,7 +29,9 @@ library.add(
   faUtensils,
   faHotel
 );
+
 const pinia = createPinia();
+
 createApp(App)
   .component("font-awesome-icon", FontAwesomeIcon)
   .use(router)
