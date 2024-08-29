@@ -40,8 +40,15 @@ export const getTrips = async () => {
 };
 
 export const loadTripsIntoIndexedDB = async () => {
-  await insertTrips(tripsData.trips);
-  console.log("Trips data inserted into IndexedDB");
+  const storedTrips = await getTrips();
+
+  if (storedTrips.length === 0) {
+    // No trips found, populate from JSON
+    await insertTrips(tripsData.trips);
+    console.log("Trips data inserted into IndexedDB");
+  } else {
+    console.log("Trips data already exists in IndexedDB");
+  }
 };
 
 loadTripsIntoIndexedDB();

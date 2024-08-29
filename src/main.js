@@ -2,8 +2,6 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import "./style.css";
 import { router } from "./router";
-import { loadTripsIntoIndexedDB } from "./utils/idb"; // Import function
-import tripsData from "./data/trips.json"; // Import initial data
 
 import App from "./App.vue";
 /* import the fontawesome core */
@@ -33,10 +31,6 @@ library.add(
 );
 
 const pinia = createPinia();
-
-loadTripsIntoIndexedDB(tripsData).then(() => {
-  console.log("Trips loaded into IndexedDB");
-});
 
 createApp(App)
   .component("font-awesome-icon", FontAwesomeIcon)
