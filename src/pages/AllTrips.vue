@@ -1,13 +1,12 @@
 <script setup>
 import { useTripsStore } from "../stores/trips";
-import { onMounted, ref } from "vue";
+import { onMounted, watch } from "vue";
 import TripCard from "../components/TripCard.vue";
 
 const tripsStore = useTripsStore();
 const trips = tripsStore.allTrips;
-onMounted(() => {
-  tripsStore.loadTrips();
-  console.log(trips);
+onMounted(async () => {
+  await tripsStore.loadTrips();
 });
 </script>
 

@@ -29,8 +29,7 @@ onMounted(() => {
 const checkVisited = (stop, tripId, dayIndex, stopIndex) => {
   stop.visited = !stop.visited;
   tripId = Number(tripId);
-  console.log("dayIndexBefore: " + dayIndex);
-  console.log("stopIndexBefore: " + stopIndex);
+
   updateStopVisitedStatus(tripId, stopIndex, dayIndex, stop.visited);
 };
 

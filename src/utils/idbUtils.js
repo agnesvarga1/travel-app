@@ -7,15 +7,10 @@ export const updateStopVisitedStatus = async (
   stopIndex,
   visitedStatus
 ) => {
-  console.log(
-    `Received tripId: ${tripId}, dayIndex: ${dayIndex}, stopIndex: ${stopIndex}, visitedStatus: ${visitedStatus}`
-  );
   const db = await initDB();
   const tx = db.transaction("trips", "readwrite");
   const store = tx.objectStore("trips");
-  console.log(
-    `Received tripId: ${tripId}, dayIndex: ${dayIndex}, stopIndex: ${stopIndex}, visitedStatus: ${visitedStatus}`
-  );
+
   // Retrieve the specific trip by ID
   const trip = await store.get(tripId);
 
@@ -61,7 +56,7 @@ export const updateTripNotes = async (tripId, notes) => {
 
     // Store the updated trip back in the store
     await store.put(trip);
-    console.log(`Trip with ID ${tripId} notes updated successfully.`);
+    // console.log(`Trip with ID ${tripId} notes updated successfully.`);
   } else {
     console.error(`Trip with ID ${tripId} not found.`);
   }

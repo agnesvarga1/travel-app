@@ -1,6 +1,6 @@
 <script setup>
 import { useTripsStore } from "../stores/trips";
-import { onMounted, ref } from "vue";
+import { onMounted, reactive, ref, watch, onBeforeMount } from "vue";
 import TripCard from "../components/TripCard.vue";
 import { RouterLink, useRoute } from "vue-router";
 import moment from "moment";
@@ -12,16 +12,18 @@ const isActive = (path) => {
 };
 
 const tripsStore = useTripsStore();
-const trips = tripsStore.allTrips;
-onMounted(() => {
-  tripsStore.loadTrips();
-  findOngoingAndUpcomingTrips();
+const trips = reactive(tripsStore.allTrips);
+
+onMounted(async () => {
+  await tripsStore.loadTrips(); // Ensure data is loaded first
+
+  findOngoingAndUpcomingTrips(); // Then find trips
 });
 
 const now = moment().format("YYYY-MM-DD");
 
-const ongoingTrip = ref(null); // Store the ongoing holiday
-const upcomingTrip = ref(null); // Store the next upcoming holiday
+const ongoingTrip = ref(null);
+const upcomingTrip = ref(null);
 
 const findOngoingAndUpcomingTrips = () => {
   let closestUpcoming = null;
@@ -33,6 +35,7 @@ const findOngoingAndUpcomingTrips = () => {
     // Check if the trip is ongoing
     if (moment(now).isBetween(tripStart, tripEnd, null, "[]")) {
       ongoingTrip.value = trip;
+
       return; // Exit early if we find an ongoing trip
     }
 
@@ -52,6 +55,10 @@ const findOngoingAndUpcomingTrips = () => {
     upcomingTrip.value = closestUpcoming;
   }
 };
+
+watch(trips, (newTrip) => {
+  findOngoingAndUpcomingTrips();
+});
 </script>
 
 <template>
