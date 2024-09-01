@@ -3,6 +3,15 @@ import PrimaryBtn from "./PrimaryBtn.vue";
 import { RouterLink } from "vue-router";
 import LocationsMap from "./LocationsMap.vue";
 import { ref } from "vue";
+
+const getImageSrc = (img) => {
+  if (img.startsWith("data:image")) {
+    return img;
+  }
+  // Otherwise, use the fallback image from the public folder
+  return `/images/${img}`;
+};
+
 defineProps({
   trip: Object,
 });
@@ -13,7 +22,7 @@ let isModal = ref(false);
     class="trip-card w-80 mx-auto shadow-lg mt-3 rounded-lg overflow-hidden realtive"
   >
     <div class="card-header">
-      <img :src="`/images/${trip.cover}`" :alt="trip.title" />
+      <img :src="getImageSrc(trip.cover)" :alt="trip.title" />
     </div>
     <div class="card-body p-2">
       <div class="flex justify-between">

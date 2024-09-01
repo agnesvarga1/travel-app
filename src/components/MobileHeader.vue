@@ -3,7 +3,9 @@ import { RouterLink } from "vue-router";
 </script>
 
 <template>
-  <header class="h-14 text-dark bg-light fixed top-0 left-0 p-3 w-full">
+  <header
+    class="h-14 text-dark bg-light fixed top-0 left-0 p-3 w-full bg-white"
+  >
     <router-link :to="{ name: 'home' }">
       <div class="logo flex items-baseline">
         <svg

@@ -40,14 +40,15 @@ const getMarkers = () => {
         .openPopup();
     });
   }
-
-  currTrip.value.restaurants.forEach((restaurant) => {
-    L.marker([restaurant.latitude, restaurant.longitude], {
-      icon: iconsStore.getRestaurantIcon,
-    })
-      .addTo(map)
-      .bindPopup(`<b>${restaurant.name}</b>`);
-  });
+  if (currTrip.value.restaurants) {
+    currTrip.value.restaurants.forEach((restaurant) => {
+      L.marker([restaurant.latitude, restaurant.longitude], {
+        icon: iconsStore.getRestaurantIcon,
+      })
+        .addTo(map)
+        .bindPopup(`<b>${restaurant.name}</b>`);
+    });
+  }
 };
 
 const initializeMap = () => {

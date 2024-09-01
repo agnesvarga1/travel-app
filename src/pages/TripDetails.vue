@@ -68,6 +68,14 @@ const submitNote = (id, n) => {
   tripsStore.updateTripNotes(id, n);
   isNoteModal.value = false;
 };
+
+const getImageSrc = (img) => {
+  if (img.startsWith("data:image")) {
+    return img;
+  }
+
+  return `/images/${img}`;
+};
 </script>
 
 <template>
@@ -75,7 +83,7 @@ const submitNote = (id, n) => {
     <div v-if="trip">
       <div class="flex">
         <figure class="w-24">
-          <img :src="`/images/${trip.cover}`" alt="cover image" />
+          <img :src="getImageSrc(trip.cover)" alt="cover image" />
         </figure>
         <div class="text-xs p-3 pt-1 text-dark font-body">
           <h1 class="text-accent text-xl font-semibold font-heading">
@@ -113,6 +121,7 @@ const submitNote = (id, n) => {
         </div>
       </div>
       <!-- Stops -->
+      <div></div>
       <h2 class="font-heading text-dark" v-if="trip.days">Stops:</h2>
       <div class="mt-2" v-for="(day, dayIndex) in trip.days" :key="dayIndex">
         <h1 class="font-heading text-dark flex justify-between text-lg">
