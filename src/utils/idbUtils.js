@@ -27,9 +27,9 @@ export const updateStopVisitedStatus = async (
 
       // Store the updated trip back in the store
       await store.put(trip);
-      console.log(
-        `Stop with index ${stopIndex} in day ${dayIndex} of trip with ID ${tripId} updated successfully.`
-      );
+      // console.log(
+      //   `Stop with index ${stopIndex} in day ${dayIndex} of trip with ID ${tripId} updated successfully.`
+      // );
     } else {
       console.error(
         `Specified day or stop not found in trip with ID ${tripId}.`

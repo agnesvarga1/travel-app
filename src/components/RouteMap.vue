@@ -31,17 +31,16 @@ const initializeMap = () => {
     });
     latlngs.push([props.hotel.latitude, props.hotel.longitude]);
   }
-
+  if (props.hotel) {
+    L.marker([props.hotel.latitude, props.hotel.longitude], {
+      icon: iconsStore.getHotelIcon,
+    })
+      .addTo(map)
+      .bindPopup(`<b>${props.hotel.name}</b>`);
+  }
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
   }).addTo(map);
-
-  L.marker([props.hotel.latitude, props.hotel.longitude], {
-    icon: iconsStore.getHotelIcon,
-  })
-    .addTo(map)
-    .bindPopup(`<b>${props.hotel.name}</b>`);
-
   // To ensure map renders correctly
   map.invalidateSize();
   props.stops.forEach((stop) => {

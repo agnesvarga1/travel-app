@@ -11,7 +11,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl">
+  <div
+    class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl md:flex md:items-start md:justify-center"
+  >
     <TripCard v-for="trip in trips" :trip="trip" :key="trip.id" />
   </div>
 </template>

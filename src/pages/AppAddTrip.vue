@@ -6,7 +6,7 @@ import axios from "axios";
 import { debounce } from "lodash-es";
 import { insertTrips } from "../utils/idb";
 const selectedDate = ref(null);
-
+const isSuccessMessage = ref(false);
 const isOpen = ref(false);
 const isOneDay = ref(false);
 const successMessage = ref("");
@@ -191,7 +191,7 @@ const saveTrip = async () => {
     };
 
     await insertTrips([plainTrip]);
-
+    isSuccessMessage.value = true;
     successMessage.value = "Trip saved successfully!";
     setTimeout(() => {
       window.location.reload(); // Refresh the page
@@ -203,119 +203,124 @@ const saveTrip = async () => {
 </script>
 
 <template>
-  <div
-    class="max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden"
-  >
+  <div class="overflow-auto pb-20">
     <div
-      class="text-2xl py-4 px-6 bg-accent text-white text-center font-heading uppercase"
+      class="max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-auto"
     >
-      Add a new trip
-    </div>
-    <div class="py-4 px-6">
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="name"> Title </label>
-        <input
-          v-model="newTrip.title"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-          id="name"
-          type="text"
-          placeholder="My holiday title"
-          required
-        />
+      <div
+        class="text-2xl py-4 px-6 bg-accent text-white text-center font-heading uppercase"
+      >
+        Add a new trip
       </div>
-      <div class="mb-5">
-        <div class="flex items-center space-x-6">
-          <div class="flex items-center">
-            <input
-              v-model="isOneDay"
-              type="checkbox"
-              name="checkbox"
-              id="radioButton1"
-              class="h-4 w-4"
-            />
-            <label
-              for="radioButton1"
-              class="pl-3 text-base font-body text-dark"
-            >
-              One day Trip
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="date">
-          Start Date
-        </label>
-        <input
-          v-model="newTrip.startDate"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-          id="starDate"
-          type="date"
-          placeholder="Select a date"
-          required
-        />
-      </div>
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="date">
-          End Date
-        </label>
-        <input
-          v-model="newTrip.endDate"
-          :disabled="isOneDay"
-          :class="
-            isOneDay
-              ? 'bg-slate-50 text-slate-500 border-slate-200 shadow-none'
-              : ''
-          "
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-          id="endDate"
-          type="date"
-          placeholder="Select a date"
-        />
-      </div>
-      <input
-        @change="handleImage"
-        class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-        type="file"
-        accept="image/*"
-      />
-
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="message">
-          Description
-        </label>
-        <textarea
-          v-model="newTrip.description"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-          id="message"
-          rows="4"
-          placeholder="Description of the journey goes here"
-        ></textarea>
-      </div>
-      <div v-if="datesArray.length > 0" class="mb-4">
-        <h3 class="font-body text-dark">Add stop to the trip</h3>
-        <div
-          v-for="date in datesArray"
-          :key="date"
-          class="mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-dark"
-        >
-          <div v-for="day in daysToSign">
-            <span v-for="stop in day.stops">{{ stop.name }}<br /></span>
-          </div>
-          <label class="block text-dark font-body mb-2" for="message">
-            {{ date }}
+      <div class="py-4 px-6">
+        <div class="mb-4">
+          <label class="block text-dark font-body mb-2" for="name">
+            Title
           </label>
-          <PrimaryBtn @click="openModal(date)" type="button"
-            >Add Stop</PrimaryBtn
-          >
+          <input
+            v-model="newTrip.title"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+            id="name"
+            type="text"
+            placeholder="My holiday title"
+            required
+          />
         </div>
-      </div>
+        <div class="mb-5">
+          <div class="flex items-center space-x-6">
+            <div class="flex items-center">
+              <input
+                v-model="isOneDay"
+                type="checkbox"
+                name="checkbox"
+                id="radioButton1"
+                class="h-4 w-4"
+              />
+              <label
+                for="radioButton1"
+                class="pl-3 text-base font-body text-dark"
+              >
+                One day Trip
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-dark font-body mb-2" for="date">
+            Start Date
+          </label>
+          <input
+            v-model="newTrip.startDate"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+            id="starDate"
+            type="date"
+            placeholder="Select a date"
+            required
+          />
+        </div>
+        <div class="mb-4">
+          <label class="block text-dark font-body mb-2" for="date">
+            End Date
+          </label>
+          <input
+            v-model="newTrip.endDate"
+            :disabled="isOneDay"
+            :class="
+              isOneDay
+                ? 'bg-slate-50 text-slate-500 border-slate-200 shadow-none'
+                : ''
+            "
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+            id="endDate"
+            type="date"
+            placeholder="Select a date"
+          />
+        </div>
+        <input
+          @change="handleImage"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+          type="file"
+          accept="image/*"
+        />
 
-      <div class="flex items-center justify-center mb-4">
-        <PrimaryBtn @click="saveTrip"> Add Trip </PrimaryBtn>
+        <div class="mb-4">
+          <label class="block text-dark font-body mb-2" for="message">
+            Description
+          </label>
+          <textarea
+            v-model="newTrip.description"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+            id="message"
+            rows="4"
+            placeholder="Description of the journey goes here"
+          ></textarea>
+        </div>
+        <div v-if="datesArray.length > 0" class="mb-4">
+          <h3 class="font-body text-dark">Add stop to the trip</h3>
+          <div
+            v-for="date in datesArray"
+            :key="date"
+            class="mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-dark"
+          >
+            <div v-for="day in daysToSign">
+              <span v-for="stop in day.stops">{{ stop.name }}<br /></span>
+            </div>
+            <label class="block text-dark font-body mb-2" for="message">
+              {{ date }}
+            </label>
+            <PrimaryBtn @click="openModal(date)" type="button"
+              >Add Stop</PrimaryBtn
+            >
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center mb-4">
+          <PrimaryBtn @click="saveTrip"> Add Trip </PrimaryBtn>
+        </div>
       </div>
     </div>
   </div>
+
   <div v-if="isSuccessMessage" class="w-full absolute top-10">
     <div
       class="p-2 max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden"
