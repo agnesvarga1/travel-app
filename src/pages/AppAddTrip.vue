@@ -50,8 +50,7 @@ const fetchCoordinates = async () => {
       )}.json`,
       {
         params: {
-          access_token:
-            "pk.eyJ1IjoiYWdoeS12IiwiYSI6ImNtMGh4dXI4YzBmNGUyb3NsbWN1MWRzZjEifQ.eskvrdVOA2xM71Yu8u_p_w",
+          access_token: import.meta.env.VITE_API_KEY_MP,
           limit: 1,
         },
       }
