@@ -1,6 +1,6 @@
 <script setup>
 import { useTripsStore } from "../stores/trips";
-import { onMounted, reactive, ref, watch, onBeforeMount } from "vue";
+import { onMounted, ref, watch } from "vue";
 import TripCard from "../components/TripCard.vue";
 import { RouterLink, useRoute } from "vue-router";
 import moment from "moment";
@@ -12,30 +12,25 @@ const isActive = (path) => {
 };
 
 const tripsStore = useTripsStore();
-const trips = reactive(tripsStore.allTrips);
-
-onMounted(async () => {
-  await tripsStore.loadTrips(); // Ensure data is loaded first
-
-  findOngoingAndUpcomingTrips(); // Then find trips
-});
+const trips = ref([]); // Use ref to make `trips` reactive
 
 const now = moment().format("YYYY-MM-DD");
 
 const ongoingTrip = ref(null);
 const upcomingTrip = ref(null);
 
+// Function to find ongoing and upcoming trips
 const findOngoingAndUpcomingTrips = () => {
   let closestUpcoming = null;
 
-  for (const trip of trips) {
+  for (const trip of trips.value) {
+    // Iterate over `trips.value`
     const tripStart = moment(trip.startDate).format("YYYY-MM-DD");
     const tripEnd = moment(trip.endDate).format("YYYY-MM-DD");
 
     // Check if the trip is ongoing
     if (moment(now).isBetween(tripStart, tripEnd, null, "[]")) {
       ongoingTrip.value = trip;
-
       return; // Exit early if we find an ongoing trip
     }
 
@@ -56,11 +51,22 @@ const findOngoingAndUpcomingTrips = () => {
   }
 };
 
-watch(trips, (newTrip) => {
-  findOngoingAndUpcomingTrips();
+// Load trips on component mount
+onMounted(async () => {
+  await tripsStore.loadTrips(); // Ensure data is loaded first
 });
+
+// Watch for changes in `tripsStore.allTrips` and update `trips` accordingly
+watch(
+  () => tripsStore.allTrips, // Watch the `allTrips` array from the store
+  (newTrips) => {
+    trips.value = newTrips; // Update the local `trips` ref when store data changes
+    findOngoingAndUpcomingTrips(); // Call function to find trips after data is updated
+  },
+  { immediate: true } // Trigger immediately in case `allTrips` is already populated
+);
 </script>
-class=""
+
 <template>
   <div class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl">
     <h1

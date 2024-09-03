@@ -88,7 +88,7 @@ const calculateDays = (startDate, endDate) => {
 
   if (isOneDay.value || !endDate) {
     datesArray.value.push(moment(startDate).format("YYYY-MM-DD"));
-    console.log(datesArray.value);
+    // console.log(datesArray.value);
     return;
   }
 
@@ -104,7 +104,7 @@ const calculateDays = (startDate, endDate) => {
     }
   }
 
-  console.log(datesArray.value);
+  // console.log(datesArray.value);
 };
 
 const addStop = () => {

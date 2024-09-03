@@ -1,13 +1,24 @@
 <script setup>
 import { useTripsStore } from "../stores/trips";
-import { onMounted, watch } from "vue";
+import { onMounted, watch, ref } from "vue";
 import TripCard from "../components/TripCard.vue";
 
 const tripsStore = useTripsStore();
-const trips = tripsStore.allTrips;
+const trips = ref([]); // Use ref to make `trips` reactive
+
+// Load trips on component mount
 onMounted(async () => {
   await tripsStore.loadTrips();
 });
+
+// Watch for changes in `tripsStore.allTrips` and update `trips` accordingly
+watch(
+  () => tripsStore.allTrips, // Watch the `allTrips` array from the store
+  (newTrips) => {
+    trips.value = newTrips; // Update the local `trips` ref when store data changes
+  },
+  { immediate: true } // Trigger immediately in case `allTrips` is already populated
+);
 </script>
 
 <template>

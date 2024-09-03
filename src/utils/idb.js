@@ -39,6 +39,16 @@ export const getTrips = async () => {
   return db.getAll(STORE_NAME);
 };
 
+export const deleteTrip = async (tripId) => {
+  const db = await initDB(); // Initialize the database
+  const tx = db.transaction(STORE_NAME, "readwrite"); // Open a transaction
+  const store = tx.objectStore(STORE_NAME); // Get the object store
+
+  await store.delete(tripId); // Delete the trip by its ID
+
+  await tx.done; // Ensure the transaction is complete
+};
+
 export const loadTripsIntoIndexedDB = async () => {
   const storedTrips = await getTrips();
 
