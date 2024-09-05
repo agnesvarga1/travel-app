@@ -2,24 +2,11 @@
 import PrimaryBtn from "../components/PrimaryBtn.vue";
 import { reactive, ref, watch, toRaw } from "vue";
 import moment from "moment";
-import axios from "axios";
-import { debounce } from "lodash-es";
 import { insertTrips } from "../utils/idb";
-const selectedDate = ref(null);
+
 const isSuccessMessage = ref(false);
-const isOpen = ref(false);
 const isOneDay = ref(false);
 const successMessage = ref("");
-const stopDescription = ref("");
-const singleStop = reactive([
-  {
-    name: "",
-    description: "",
-    latitude: null,
-    longitude: null,
-    notes: "",
-  },
-]);
 
 const datesArray = ref([]);
 
@@ -30,69 +17,15 @@ const newTrip = reactive({
   endDate: null,
   cover: "",
   description: "",
-  days: daysToSign,
+  days: daysToSign, // This will be populated with day objects
 });
 
-const openModal = (date) => {
-  selectedDate.value = date;
-  isOpen.value = true;
-};
-
-const fetchCoordinates = async () => {
-  if (!singleStop.name) {
-    return;
-  }
-
-  try {
-    const response = await axios.get(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        singleStop.name
-      )}.json`,
-      {
-        params: {
-          access_token: import.meta.env.VITE_API_KEY_MP,
-          limit: 1,
-        },
-      }
-    );
-
-    if (response.data.features && response.data.features.length > 0) {
-      const [longitude, latitude] =
-        response.data.features[0].geometry.coordinates;
-
-      // Create a new object to trigger reactivity
-      const updatedStop = {
-        ...singleStop, // Copy existing data
-        latitude,
-        longitude,
-      };
-
-      // Update the singleStop reactive object
-      singleStop.name = updatedStop.name;
-      singleStop.description = updatedStop.description;
-      singleStop.latitude = updatedStop.latitude;
-      singleStop.longitude = updatedStop.longitude;
-
-      console.log("Longitude:", longitude, "Latitude:", latitude);
-    } else {
-      console.error("No coordinates found for the given address");
-    }
-  } catch (error) {
-    console.error("Error fetching coordinates:", error);
-  }
-};
-
-const now = moment().format("YYYY-MM-DD");
 const calculateDays = (startDate, endDate) => {
   datesArray.value = [];
 
   if (isOneDay.value || !endDate) {
     datesArray.value.push(moment(startDate).format("YYYY-MM-DD"));
-    // console.log(datesArray.value);
-    return;
-  }
-
-  if (startDate && endDate) {
+  } else if (startDate && endDate) {
     let currentDate = moment(startDate).format("YYYY-MM-DD");
     const formattedEndDate = moment(endDate).format("YYYY-MM-DD");
 
@@ -104,50 +37,32 @@ const calculateDays = (startDate, endDate) => {
     }
   }
 
-  // console.log(datesArray.value);
+  // Populate `daysToSign` with day objects
+  daysToSign.splice(0); // Clear the array first
+  datesArray.value.forEach((date) => {
+    daysToSign.push({
+      date, // Set the date for the day
+      stops: [], // Initialize with an empty stops array
+    });
+  });
 };
-
-const addStop = () => {
-  let day = daysToSign.find((d) => d.date === selectedDate.value);
-
-  // If the date doesn't exist, create a new day with an empty stops array
-  if (!day) {
-    day = { date: selectedDate.value, stops: [] };
-    daysToSign.push(day);
-  }
-
-  // Push the stop into the stops array for the corresponding date
-  day.stops.push({ ...singleStop });
-  singleStop.name = "";
-  singleStop.description = "";
-  singleStop.longitude = null;
-  singleStop.latitude = null;
-  stopDescription.value = "";
-  console.log(daysToSign);
-  isOpen.value = false;
-};
-
-const debouncedFetchCoordinates = debounce(fetchCoordinates, 500);
 
 const createBase64Image = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-
     reader.onloadend = () => {
       resolve(reader.result); // Base64 string
     };
-
     reader.onerror = reject;
-
     reader.readAsDataURL(file);
   });
 };
 
 const handleImage = async (e) => {
-  const selectedImage = e.target.files[0]; // Get the first file
+  const selectedImage = e.target.files[0];
   try {
     const base64Image = await createBase64Image(selectedImage);
-    newTrip.cover = base64Image; // Store the Base64 string in newTrip.cover
+    newTrip.cover = base64Image;
   } catch (error) {
     console.error("Error converting image to Base64:", error);
   }
@@ -156,14 +71,7 @@ const handleImage = async (e) => {
 watch(
   [() => newTrip.startDate, () => newTrip.endDate],
   ([startDate, endDate]) => {
-    const daysCount = calculateDays(startDate, endDate);
-  }
-);
-
-watch(
-  () => singleStop.name,
-  () => {
-    debouncedFetchCoordinates();
+    calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
   }
 );
 
@@ -191,7 +99,8 @@ const saveTrip = async () => {
 
     await insertTrips([plainTrip]);
     isSuccessMessage.value = true;
-    successMessage.value = "Trip saved successfully!";
+    successMessage.value =
+      "Trip saved successfully! To add stops and more, go to this newly created trip's details.";
     setTimeout(() => {
       window.location.reload(); // Refresh the page
     }, 2000);
@@ -294,24 +203,6 @@ const saveTrip = async () => {
             placeholder="Description of the journey goes here"
           ></textarea>
         </div>
-        <div v-if="datesArray.length > 0" class="mb-4">
-          <h3 class="font-body text-dark">Add stop to the trip</h3>
-          <div
-            v-for="date in datesArray"
-            :key="date"
-            class="mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-dark"
-          >
-            <div v-for="day in daysToSign">
-              <span v-for="stop in day.stops">{{ stop.name }}<br /></span>
-            </div>
-            <label class="block text-dark font-body mb-2" for="message">
-              {{ date }}
-            </label>
-            <PrimaryBtn @click="openModal(date)" type="button"
-              >Add Stop</PrimaryBtn
-            >
-          </div>
-        </div>
 
         <div class="flex items-center justify-center mb-4">
           <PrimaryBtn @click="saveTrip"> Add Trip </PrimaryBtn>
@@ -325,46 +216,6 @@ const saveTrip = async () => {
       class="p-2 max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden"
     >
       <h2 class="text-body text-primary">{{ successMessage }}</h2>
-    </div>
-  </div>
-  <!-- STOP MODAL -->
-  <div v-if="isOpen" class="w-full absolute top-10">
-    <div
-      class="p-2 max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden"
-    >
-      <h3 class="flex justify-between font-heading text-dark">
-        Add stop to the trip:
-        <PrimaryBtn
-          class="close-button font-body text-xl"
-          @click="isOpen = false"
-          >X</PrimaryBtn
-        >
-      </h3>
-
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="name"> Title </label>
-        <input
-          v-model="singleStop.name"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-          id="name"
-          type="text"
-          placeholder="City and Stop Name here"
-          required
-        />
-      </div>
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="message">
-          Description
-        </label>
-        <textarea
-          v-model="singleStop.description"
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
-          id="message"
-          rows="4"
-          placeholder="Description of the stop"
-        ></textarea>
-      </div>
-      <PrimaryBtn @click="addStop(selectedDate)"> Save Stop </PrimaryBtn>
     </div>
   </div>
 </template>

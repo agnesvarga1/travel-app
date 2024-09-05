@@ -1,7 +1,8 @@
 <script setup>
 import { useRoute } from "vue-router";
-import { computed, onMounted, ref, reactive, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useTripsStore } from "../stores/trips";
+import AddStopModal from "../components/AddStopModal.vue";
 import PrimaryBtn from "../components/PrimaryBtn.vue";
 import DayCard from "../components/DayCard.vue";
 import RouteMap from "../components/RouteMap.vue";
@@ -20,9 +21,12 @@ const selectedDayStops = ref([]);
 const selectedHotel = ref(null);
 let isNoteModal = ref(false);
 let note = ref("");
-
+const isDisabled = ref(false);
+const isStopModal = ref(false);
+const currentDayIndex = ref(null);
 onMounted(() => {
   tripsStore.loadTrips();
+  disableMap(trip.value);
 });
 
 // Function to toggle visited status of stops and save to indexedDB
@@ -76,6 +80,23 @@ const getImageSrc = (img) => {
 
   return `/images/${img}`;
 };
+
+const disableMap = (t, i) => {
+  t.days.forEach((d) => {
+    if (d.stops.length === 0) isDisabled.value = true;
+  });
+};
+
+const openAddStops = (i) => {
+  currentDayIndex.value = i;
+  //console.log(currentDayIndex.value);
+  isStopModal.value = true;
+};
+
+const closeAddStop = () => {
+  isStopModal.value = false;
+  currentDayIndex.value = null;
+};
 </script>
 
 <template>
@@ -94,8 +115,11 @@ const getImageSrc = (img) => {
             >
               {{ trip.title }}
             </h1>
-            <p>From: {{ trip.startDate }}</p>
-            <p>To: {{ trip.endDate }}</p>
+            <p>
+              <span v-if="trip.endDate"> From:</span> <span v-else>On:</span>
+              {{ trip.startDate }}
+            </p>
+            <p v-if="trip.endDate">To: {{ trip.endDate }}</p>
           </div>
         </div>
 
@@ -105,7 +129,7 @@ const getImageSrc = (img) => {
               <strong>Description:</strong> {{ trip.description }}
             </p>
             <div
-              v-if="trip.notes !== ''"
+              v-if="trip.notes"
               class="text-dark font-body text-sm mt-2 flex justify-between items-start"
             >
               <p>
@@ -139,19 +163,26 @@ const getImageSrc = (img) => {
           <h1 class="font-heading text-dark text-lg">Day {{ dayIndex + 1 }}</h1>
           <div @click="openMap(day)">
             <font-awesome-icon
-              class="bg-primary rounded-md p-2 text-xl text-light hover:bg-dark cursor-pointer"
+              :class="{
+                'bg-primary rounded-md p-2 text-xl text-light self-start cursor-pointer hover:bg-dark':
+                  !isDisabled,
+                'opacity-50 pointer-events-none': isDisabled,
+              }"
               :icon="['fas', 'map-location-dot']"
             />
           </div>
         </div>
+        <div>
+          <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
+          <PrimaryBtn @click="openAddStops(dayIndex)">Add Stop</PrimaryBtn>
+        </div>
 
-        <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
-        <div class="w-full md:flex">
-          <DayCard
-            v-for="(stop, stopIndex) in day.stops"
-            class="relative md:w-1/2"
-            :key="stopIndex"
-          >
+        <div
+          class="w-full md:flex relative"
+          v-for="(stop, stopIndex) in day.stops"
+          :key="stopIndex"
+        >
+          <DayCard class="relative md:w-1/2">
             <template v-slot:header>
               <svg
                 @click="checkVisited(stop, tripId, stopIndex, dayIndex)"
@@ -190,7 +221,16 @@ const getImageSrc = (img) => {
               </div>
             </template>
           </DayCard>
+          <PrimaryBtn class="absoloute top-0 right-0"
+            ><i class="fa-solid fa-trash-can"></i
+          ></PrimaryBtn>
         </div>
+        <AddStopModal
+          v-if="isStopModal"
+          @close="closeAddStop"
+          :trip-id="trip.id"
+          :day-index="currentDayIndex"
+        />
       </div>
       <!-- Hotels and Ristos -->
       <h2 class="font-heading text-dark pt-2" v-if="trip.hotels">Hotels:</h2>
@@ -252,7 +292,7 @@ const getImageSrc = (img) => {
     <!-- NOTE MODAL -->
     <div
       v-if="isNoteModal"
-      class="note-modal absolute top-10 w-full bg-white flex flex-col align-center p-3 md:w-1/2 md:top"
+      class="note-modal absolute top-10 w-80 bg-white flex flex-col align-center p-3 md:w-1/2 md:top"
     >
       <h3 class="flex justify-between p-2 font-heading text-dark">
         Add Note

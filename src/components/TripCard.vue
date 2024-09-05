@@ -4,23 +4,39 @@ import SecondaryBtn from "./SecondaryBtn.vue";
 import { useTripsStore } from "../stores/trips";
 import { RouterLink } from "vue-router";
 import LocationsMap from "./LocationsMap.vue";
-import { ref } from "vue";
-
+import { ref, onMounted } from "vue";
+const tripsStore = useTripsStore();
+// Get image source utility function
 const getImageSrc = (img) => {
   if (img.startsWith("data:image")) {
     return img;
   }
-  // Otherwise image from the public folder
+  // Otherwise, return the image from the public folder
   return `/images/${img}`;
 };
 
-defineProps({
+// Define props to receive the trip object
+const props = defineProps({
   trip: Object,
 });
+
+// Local state
 let isModal = ref(false);
 let isDeleteModal = ref(false);
+const isDisabled = ref(false);
 
-const tripsStore = useTripsStore();
+const controlStopExistence = () => {
+  // Check if all stops arrays in the days array are empty
+  //The every() method returns true only if all elements in the array satisfy the condition.
+  const allStopsEmpty = props.trip.days.every((day) => day.stops.length === 0);
+
+  // Disable the button if all stops are empty
+  isDisabled.value = allStopsEmpty;
+};
+// Trigger controlStopExistence on mount
+onMounted(() => {
+  controlStopExistence();
+});
 </script>
 <template>
   <div
@@ -37,11 +53,15 @@ const tripsStore = useTripsStore();
           <span class="font-body">From: {{ trip.startDate }} </span><br />
           <span class="font-body"> To: {{ trip.endDate }}</span>
         </div>
-        <div @click="isModal = true">
-          <font-awesome-icon
-            class="bg-primary rounded-md p-2 text-xl text-light hover:bg-dark cursor-pointer"
-            :icon="['fas', 'map-location-dot']"
-          />
+        <div
+          @click="isModal = true"
+          :class="{
+            'bg-primary rounded-md p-2 text-xl text-light self-start cursor-pointer hover:bg-dark':
+              !isDisabled,
+            'opacity-50 pointer-events-none': isDisabled,
+          }"
+        >
+          <font-awesome-icon :icon="['fas', 'map-location-dot']" />
         </div>
       </div>
 
