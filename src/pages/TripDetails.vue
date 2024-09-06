@@ -6,6 +6,7 @@ import AddStopModal from "../components/AddStopModal.vue";
 import PrimaryBtn from "../components/PrimaryBtn.vue";
 import DayCard from "../components/DayCard.vue";
 import RouteMap from "../components/RouteMap.vue";
+import DeleteModal from "../components/DeleteModal.vue";
 import moment from "moment";
 import { updateStopVisitedStatus } from "../utils/idbUtils";
 
@@ -23,10 +24,13 @@ let isNoteModal = ref(false);
 let note = ref("");
 const isDisabled = ref(false);
 const isStopModal = ref(false);
+const isDeleteModal = ref(false);
 const currentDayIndex = ref(null);
+const currentIndex = ref(null);
+const stop = "stop";
 onMounted(() => {
   tripsStore.loadTrips();
-  disableMap(trip.value);
+  // disableMap(trip.value);
 });
 
 // Function to toggle visited status of stops and save to indexedDB
@@ -97,6 +101,18 @@ const closeAddStop = () => {
   isStopModal.value = false;
   currentDayIndex.value = null;
 };
+
+const openDeleteModal = (di, i) => {
+  isDeleteModal.value = true;
+  currentDayIndex.value = di;
+  currentIndex.value = i;
+};
+
+const closeDeleteModal = () => {
+  isDeleteModal.value = false;
+  currentDayIndex.value = null;
+  currentIndex.value = null;
+};
 </script>
 
 <template>
@@ -152,7 +168,15 @@ const closeAddStop = () => {
       </div>
 
       <!-- Stops -->
-
+      <!-- DELETE MODAL -->
+      <DeleteModal
+        v-if="isDeleteModal"
+        @close="closeDeleteModal"
+        :tripId="trip.id"
+        :dayIndex="currentDayIndex"
+        :itemId="currentIndex"
+        :flag="stop"
+      />
       <h2 class="font-heading text-dark" v-if="trip.days">Stops:</h2>
       <div
         class="mt-2 md:flex md:items-center md:gap-2"
@@ -178,7 +202,7 @@ const closeAddStop = () => {
         </div>
 
         <div
-          class="w-full md:flex relative"
+          class="w-full flex shadow-xl rounded-md overflow-hidden"
           v-for="(stop, stopIndex) in day.stops"
           :key="stopIndex"
         >
@@ -221,10 +245,14 @@ const closeAddStop = () => {
               </div>
             </template>
           </DayCard>
-          <PrimaryBtn class="absoloute top-0 right-0"
+          <PrimaryBtn
+            @click="openDeleteModal(dayIndex, stopIndex)"
+            class="top-0 right-0 self-start m-2"
             ><i class="fa-solid fa-trash-can"></i
           ></PrimaryBtn>
         </div>
+
+        <!-- ADD STOP MODAL -->
         <AddStopModal
           v-if="isStopModal"
           @close="closeAddStop"

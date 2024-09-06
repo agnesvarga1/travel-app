@@ -112,19 +112,20 @@ export const deleteStop = async (tripId, dayIndex, stop) => {
 
   if (trip) {
     // Ensure the day and stop exist
+
     if (
       trip.days &&
       trip.days[dayIndex] &&
       trip.days[dayIndex].stops &&
-      trip.days[dayIndex].stops[stopIndex]
+      trip.days[dayIndex].stops[stop]
     ) {
       // Remove the stop from the stops array
-      trip.days[dayIndex].stops.splice(stopIndex, 1);
+      trip.days[dayIndex].stops.splice(stop, 1);
 
       // Store the updated trip back in the store
       await store.put(trip);
       console.log(
-        `Stop with index ${stopIndex} deleted from day ${dayIndex} of trip with ID ${tripId}.`
+        `Stop with index ${stop} deleted from day ${dayIndex} of trip with ID ${tripId}.`
       );
     } else {
       console.error(
