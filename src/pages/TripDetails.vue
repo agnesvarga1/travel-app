@@ -22,16 +22,13 @@ const selectedDayStops = ref([]);
 const selectedHotel = ref(null);
 let isNoteModal = ref(false);
 let note = ref("");
-const isDisabled = ref(false);
+let hasValidStops = false;
+const canShowMap = ref(false);
 const isStopModal = ref(false);
 const isDeleteModal = ref(false);
 const currentDayIndex = ref(null);
 const currentIndex = ref(null);
 const stop = "stop";
-onMounted(() => {
-  tripsStore.loadTrips();
-  // disableMap(trip.value);
-});
 
 // Function to toggle visited status of stops and save to indexedDB
 const checkVisited = (stop, tripId, dayIndex, stopIndex) => {
@@ -42,6 +39,8 @@ const checkVisited = (stop, tripId, dayIndex, stopIndex) => {
 };
 
 const openMap = (day) => {
+  if (!canShowMap.value) return;
+
   selectedDayStops.value = day.stops.map((stop) => ({
     title: stop.title,
     latitude: stop.latitude,
@@ -85,12 +84,32 @@ const getImageSrc = (img) => {
   return `/images/${img}`;
 };
 
-const disableMap = (t, i) => {
-  t.days.forEach((d) => {
-    if (d.stops.length === 0) isDisabled.value = true;
-  });
-};
+const disableMap = (trip) => {
+  // If trip or days data is not available, disable the map
+  if (!trip || !trip.days) {
+    canShowMap.value = false;
+    return;
+  }
 
+  // Assume no valid stops initially
+
+  // Loop through each day in the trip
+  trip.days.forEach((day) => {
+    // If there are stops, check for valid latitude and longitude
+    if (day.stops.length > 0) {
+      hasValidStops = true;
+      console.log(day, hasValidStops);
+      day.stops.forEach((stop) => {
+        if (stop.latitude && stop.longitude) {
+          hasValidStops = true; // Found at least one valid stop
+        }
+      });
+    }
+  });
+
+  // Set canShowMap to true if there is at least one valid stop, otherwise false
+  canShowMap.value = hasValidStops;
+};
 const openAddStops = (i) => {
   currentDayIndex.value = i;
   //console.log(currentDayIndex.value);
@@ -113,6 +132,19 @@ const closeDeleteModal = () => {
   currentDayIndex.value = null;
   currentIndex.value = null;
 };
+
+onMounted(() => {
+  tripsStore.loadTrips();
+  watch(
+    () => trip.value,
+    (newTrip) => {
+      if (newTrip) {
+        disableMap(newTrip);
+      }
+    },
+    { immediate: true } // Call the watcher immediately upon mounting
+  );
+});
 </script>
 
 <template>
@@ -185,20 +217,22 @@ const closeDeleteModal = () => {
       >
         <div class="flex justify-between md:block">
           <h1 class="font-heading text-dark text-lg">Day {{ dayIndex + 1 }}</h1>
-          <div @click="openMap(day)">
+          <div v-if="day.stops.length > 0" @click="openMap(day)">
             <font-awesome-icon
               :class="{
                 'bg-primary rounded-md p-2 text-xl text-light self-start cursor-pointer hover:bg-dark':
-                  !isDisabled,
-                'opacity-50 pointer-events-none': isDisabled,
+                  canShowMap,
+                'opacity-50 pointer-events-none': !canShowMap,
               }"
               :icon="['fas', 'map-location-dot']"
             />
           </div>
         </div>
-        <div>
+        <div class="md:flex md:flex-col md:gap-2 md:w-2/3">
           <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
-          <PrimaryBtn @click="openAddStops(dayIndex)">Add Stop</PrimaryBtn>
+          <PrimaryBtn class="self-start" @click="openAddStops(dayIndex)"
+            >Add Stop</PrimaryBtn
+          >
         </div>
 
         <div
