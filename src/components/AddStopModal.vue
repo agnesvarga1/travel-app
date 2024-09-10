@@ -1,6 +1,6 @@
 <script setup>
 import PrimaryBtn from "../components/PrimaryBtn.vue";
-import { reactive, ref, watch, toRaw, onMounted } from "vue";
+import { reactive, ref, watch, toRaw, defineEmits } from "vue";
 import { useTripsStore } from "../stores/trips";
 
 import axios from "axios";
@@ -19,7 +19,7 @@ const props = defineProps({
     required: true,
   },
 });
-
+const emit = defineEmits(["close"]);
 const newStop = reactive([
   {
     title: "",
@@ -50,7 +50,7 @@ const fetchCoordinates = async () => {
     );
     if (response.data.features && response.data.features.length > 0) {
       suggestions.value = response.data.features;
-      console.log(suggestions.value);
+      //console.log(suggestions.value);
     } else {
       console.error("No coordinates found for the given address");
     }
@@ -98,7 +98,7 @@ const selectAddress = (i) => {
   newStop.longitude = updatedStop.longitude;
 };
 
-const saveStop = () => {
+const saveStop = async () => {
   // console.log("Saving stop...");
   // console.log("newStop:", newStop); // Log the entire reactive object
   // console.log("Stop name:", newStop.title); // Log the specific property you need
@@ -106,8 +106,8 @@ const saveStop = () => {
   const stop = toRaw(newStop); // Convert to a plain object
   //console.log("Raw stop:", stop);
 
-  tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
-  // window.location.reload();
+  await tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
+  emit("close");
 };
 </script>
 

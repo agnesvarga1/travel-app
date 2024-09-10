@@ -1,7 +1,7 @@
 <script setup>
 import PrimaryBtn from "./PrimaryBtn.vue";
 import SecondaryBtn from "./SecondaryBtn.vue";
-import { onMounted } from "vue";
+import { onMounted, defineEmits } from "vue";
 import { useTripsStore } from "../stores/trips";
 
 const tripsStore = useTripsStore();
@@ -12,6 +12,7 @@ const props = defineProps({
   },
   dayIndex: {
     type: Number,
+    required: false,
   },
   itemId: {
     type: Number,
@@ -20,14 +21,27 @@ const props = defineProps({
     type: String,
   },
 });
-onMounted(() => {
-  console.log(props);
-});
 
-const deleteItem = () => {
+const emit = defineEmits(["close"]); // Correctly define the emits
+
+// onMounted(() => {
+//   console.log(props);
+// });
+
+const deleteItem = async () => {
   if (props.flag === "stop") {
-    tripsStore.deleteStopFromTrip(props.tripId, props.dayIndex, props.itemId);
-    window.location.reload();
+    await tripsStore.deleteStopFromTrip(
+      props.tripId,
+      props.dayIndex,
+      props.itemId
+    );
+    emit("close");
+  } else if (props.flag === "risto") {
+    await tripsStore.deleteRestaurantFromTrip(props.tripId, props.itemId);
+    emit("close");
+  } else if (props.flag === "hotel") {
+    await tripsStore.deleteHotelFromTrip(props.tripId, props.itemId);
+    emit("close");
   } else {
     console.log("nope");
   }

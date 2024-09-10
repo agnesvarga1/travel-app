@@ -1,6 +1,14 @@
 import { defineStore } from "pinia";
 import { getTrips, deleteTrip } from "../utils/idb";
-import { updateTripNotes, addStop, deleteStop } from "../utils/idbUtils";
+import {
+  updateTripNotes,
+  addStop,
+  deleteStop,
+  addHotel,
+  deleteHotel,
+  addRestaurant,
+  deleteRestaurant,
+} from "../utils/idbUtils";
 
 export const useTripsStore = defineStore("trips", {
   state: () => ({
@@ -74,6 +82,99 @@ export const useTripsStore = defineStore("trips", {
 
         // Persist the deletion to IndexedDB
         await deleteStop(tripId, dayIndex, stopIndex);
+      } else {
+        console.error(`Trip with ID ${tripId} not found.`);
+      }
+    },
+    // Add a hotel to a trip both in local state and IndexedDB
+    async addHotelToTrip(tripId, dayIndex, hotel) {
+      const trip = this.allTrips.find((trip) => trip.id === parseInt(tripId));
+      if (trip) {
+        if (!trip.days || !trip.days[dayIndex]) {
+          console.error(
+            `Day with index ${dayIndex} not found in trip with ID ${tripId}.`
+          );
+          return;
+        }
+
+        // Add the hotel to the specified day in the trip state
+        if (!trip.days[dayIndex].hotels) {
+          trip.days[dayIndex].hotels = [];
+        }
+        trip.days[dayIndex].hotels.push(hotel);
+
+        // Persist the hotel to IndexedDB
+        await addHotel(tripId, dayIndex, hotel);
+      } else {
+        console.error(`Trip with ID ${tripId} not found.`);
+      }
+    },
+
+    // Delete a hotel from a trip both in local state and IndexedDB
+    async deleteHotelFromTrip(tripId, hotelIndex) {
+      const trip = this.allTrips.find((trip) => trip.id === parseInt(tripId));
+      if (trip) {
+        // Check if the hotel exists at the given hotelIndex
+        if (!trip.hotels || !trip.hotels[hotelIndex]) {
+          console.error(
+            `Hotel with index ${hotelIndex} in trip with ID ${tripId}.`
+          );
+          return;
+        }
+
+        // Remove the hotel from the local state
+
+        trip.hotels.splice(hotelIndex, 1);
+
+        // Persist the deletion to IndexedDB
+        await deleteHotel(tripId, hotelIndex);
+      } else {
+        console.error(`Trip with ID ${tripId} not found.`);
+      }
+    },
+
+    // Add a restaurant to a trip both in local state and IndexedDB
+    async addRestaurantToTrip(tripId, dayIndex, restaurant) {
+      const trip = this.allTrips.find((trip) => trip.id === parseInt(tripId));
+      if (trip) {
+        if (!trip.days || !trip.days[dayIndex]) {
+          console.error(
+            `Day with index ${dayIndex} not found in trip with ID ${tripId}.`
+          );
+          return;
+        }
+
+        // Add the restaurant to the specified day in the trip state
+        if (!trip.days[dayIndex].restaurants) {
+          trip.days[dayIndex].restaurants = [];
+        }
+        trip.days[dayIndex].restaurants.push(restaurant);
+
+        // Persist the restaurant to IndexedDB
+        await addRestaurant(tripId, dayIndex, restaurant);
+      } else {
+        console.error(`Trip with ID ${tripId} not found.`);
+      }
+    },
+
+    // Delete a restaurant from a trip both in local state and IndexedDB
+    async deleteRestaurantFromTrip(tripId, restaurantIndex) {
+      const trip = this.allTrips.find((trip) => trip.id === parseInt(tripId));
+      if (trip) {
+        // Check if the restaurant exists at the given restaurantIndex
+
+        if (!trip.restaurants || !trip.restaurants[restaurantIndex]) {
+          console.error(
+            `Restaurant with index ${restaurantIndex} not found in trip with ID ${tripId}.`
+          );
+          return;
+        }
+
+        // Remove the restaurant from the local state
+        trip.restaurants.splice(restaurantIndex, 1);
+
+        // Persist the deletion to IndexedDB
+        await deleteRestaurant(tripId, restaurantIndex);
       } else {
         console.error(`Trip with ID ${tripId} not found.`);
       }
