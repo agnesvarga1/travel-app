@@ -1,14 +1,23 @@
 <script setup>
 import PrimaryBtn from "../components/PrimaryBtn.vue";
-import { reactive, ref, watch, toRaw, defineEmits } from "vue";
+import {
+  reactive,
+  ref,
+  watch,
+  toRaw,
+  defineEmits,
+  computed,
+  onMounted,
+} from "vue";
 import { useTripsStore } from "../stores/trips";
 
 import axios from "axios";
 import { debounce } from "lodash-es";
-
+import moment from "moment";
 const tripsStore = useTripsStore();
 const address = ref("");
 const suggestions = ref([]);
+const errMsg = ref("");
 const props = defineProps({
   tripId: {
     type: Number,
@@ -22,6 +31,7 @@ const props = defineProps({
     type: String,
   },
 });
+const trip = tripsStore.allTrips.find((trip) => trip.id === props.tripId);
 const emit = defineEmits(["close"]);
 const newStop = reactive([
   {
@@ -53,6 +63,57 @@ const newRisto = reactive([
     longitude: null,
   },
 ]);
+
+const validateDates = (date1, date2) => {
+  errMsg.value = "";
+  date1 = moment(date1).format("YYYY-MM-DD");
+  date2 = moment(date2).format("YYYY-MM-DD");
+  const startDate = moment(trip.startDate).format("YYYY-MM-DD");
+
+  let dateExists;
+
+  trip.hotels.forEach((hotel) => {
+    // console.log(date1 == hotel.checkIn);
+    let isPeriod = false;
+    let date = moment(hotel.checkOut).subtract(1, "days").format("YYYY-MM-DD");
+
+    if (
+      moment(date1).isBetween(hotel.checkIn, date) ||
+      moment(date2).isBetween(hotel.checkIn, hotel.checkOut)
+    ) {
+      isPeriod = true;
+    }
+
+    //if date exist
+    if (date1 == hotel.checkIn || date2 == hotel.checkOut || isPeriod) {
+      dateExists = true;
+    } else {
+      dateExists = false;
+    }
+  });
+  //console.log(moment(date1).isAfter(moment(startDate)));
+  if (
+    (moment(date1).isAfter(moment(startDate)) ||
+      moment(date1).isSame(startDate)) &&
+    !dateExists &&
+    moment(date1).isBefore(date2)
+  ) {
+    return true;
+  } else {
+    if (dateExists) {
+      errMsg.value =
+        "Hotel already booked for this period select an other date or delete a previous accomodation";
+    } else {
+      if (!moment(date1).isBefore(date2)) {
+        errMsg.value =
+          "The check-out date can Not be earlier than check-in date";
+      } else {
+        errMsg.value =
+          "The check-in date can Not be before than the trip starts";
+      }
+    }
+  }
+};
 
 const fetchCoordinates = async () => {
   if (!address.value) {
@@ -109,7 +170,7 @@ watch(
 watch(
   () => newHotel,
   (newValue) => {
-    console.log("newStop updated:", newValue);
+    console.log("newHotel updated:", newValue);
   },
   { deep: true } // Ensure deep watching of the object
 );
@@ -117,14 +178,14 @@ watch(
 watch(
   () => newRisto,
   (newValue) => {
-    console.log("newStop updated:", newValue);
+    console.log("newRisto updated:", newValue);
   },
   { deep: true } // Ensure deep watching of the object
 );
 
 const selectAddress = (i) => {
   const [longitude, latitude] = suggestions.value[i].geometry.coordinates;
-  console.log("Longitude:", longitude, "Latitude:", latitude);
+  // console.log("Longitude:", longitude, "Latitude:", latitude);
 
   if (props.flag === "stop") {
     const updatedStop = {
@@ -174,15 +235,21 @@ const saveItem = async () => {
   // console.log("Stop name:", newStop.title); // Log the specific property you need
   if (props.flag === "stop") {
     const stop = toRaw(newStop); // Convert to a plain object
-    //console.log("Raw stop:", stop);
+    console.log("Raw stop:", stop);
 
     await tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
     emit("close");
   } else if (props.flag === "hotel") {
-    console.log(newHotel);
-    const hotel = toRaw(newHotel);
-    await tripsStore.addHotelToTrip(props.tripId, hotel);
-    emit("close");
+    //console.log(newHotel);
+    validateDates(newHotel.checkIn, newHotel.checkOut);
+    if (!validateDates) {
+      return;
+    } else if (errMsg.value == "") {
+      const hotel = toRaw(newHotel);
+      console.log(hotel);
+      await tripsStore.addHotelToTrip(props.tripId, hotel);
+      emit("close");
+    }
   } else if (props.flag === "risto") {
     const risto = toRaw(newRisto);
     console.log(risto);
@@ -190,6 +257,11 @@ const saveItem = async () => {
     emit("close");
   }
 };
+
+onMounted(() => {
+  tripsStore.loadTrips();
+  //console.log(trip);
+});
 </script>
 
 <template>
@@ -197,6 +269,21 @@ const saveItem = async () => {
     class="w-full md:w-1/2 absolute top-0 md:right-1/3"
     @submit.prevent="saveItem"
   >
+    <div
+      v-if="errMsg !== ''"
+      class="errs z-10 absolute top-1/2 w-96 p-5 bg-white text-accent"
+    >
+      <div
+        class="p-2 md:p-5 flex mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden md:text-lg"
+      >
+        <p>{{ errMsg }}</p>
+        <PrimaryBtn
+          class="close-button font-body text-xl self-end"
+          @click="errMsg = ''"
+          >X</PrimaryBtn
+        >
+      </div>
+    </div>
     <div
       class="p-2 md:p-5 mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden md:text-lg"
     >

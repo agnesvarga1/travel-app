@@ -51,11 +51,14 @@ const openMap = (day) => {
   }));
 
   if (trip.value.hotels && trip.value.hotels.length > 0) {
-    const dayDate = moment(day.date); // Convert day.date to a Moment.js object
+    const dayDate = moment(day.date);
+    console.log(trip.value.hotels);
 
     selectedHotel.value = trip.value.hotels.find((hotel) => {
+      console.log(hotel);
       const checkInDate = moment(hotel.checkIn);
       const checkOutDate = moment(hotel.checkOut);
+
       return dayDate.isBetween(checkInDate, checkOutDate, "days", "[]");
     });
   } else {
