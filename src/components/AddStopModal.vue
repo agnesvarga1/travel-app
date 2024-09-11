@@ -18,6 +18,9 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  flag: {
+    type: String,
+  },
 });
 const emit = defineEmits(["close"]);
 const newStop = reactive([
@@ -30,8 +33,29 @@ const newStop = reactive([
   },
 ]);
 
+const newHotel = reactive([
+  {
+    name: "",
+    address: address.value,
+    checkIn: "",
+    checkOut: "",
+    latitude: null,
+    longitude: null,
+  },
+]);
+
+const newRisto = reactive([
+  {
+    name: "",
+    address: address.value,
+    type: "",
+    latitude: null,
+    longitude: null,
+  },
+]);
+
 const fetchCoordinates = async () => {
-  if (!newStop.title) {
+  if (!address.value) {
     return;
   }
 
@@ -82,42 +106,102 @@ watch(
   { deep: true } // Ensure deep watching of the object
 );
 
+watch(
+  () => newHotel,
+  (newValue) => {
+    console.log("newStop updated:", newValue);
+  },
+  { deep: true } // Ensure deep watching of the object
+);
+
+watch(
+  () => newRisto,
+  (newValue) => {
+    console.log("newStop updated:", newValue);
+  },
+  { deep: true } // Ensure deep watching of the object
+);
+
 const selectAddress = (i) => {
   const [longitude, latitude] = suggestions.value[i].geometry.coordinates;
-  //console.log("Longitude:", longitude, "Latitude:", latitude);
-  const updatedStop = {
-    ...newStop, // Copy existing data
-    latitude,
-    longitude,
-  };
-  suggestions.value = [];
-  // Update the singleStop reactive object
-  newStop.title = updatedStop.title;
-  newStop.description = updatedStop.description;
-  newStop.latitude = updatedStop.latitude;
-  newStop.longitude = updatedStop.longitude;
+  console.log("Longitude:", longitude, "Latitude:", latitude);
+
+  if (props.flag === "stop") {
+    const updatedStop = {
+      ...newStop, // Copy existing data
+      latitude,
+      longitude,
+    };
+    suggestions.value = [];
+    // Update the singleStop reactive object
+    newStop.title = updatedStop.title;
+    newStop.description = updatedStop.description;
+    newStop.latitude = updatedStop.latitude;
+    newStop.longitude = updatedStop.longitude;
+  } else if (props.flag === "hotel") {
+    const updatedHotel = {
+      ...newHotel, // Copy existing data
+      latitude,
+      longitude,
+    };
+    suggestions.value = [];
+    // Update the singleStop reactive object
+    newHotel.name = updatedHotel.name;
+    newHotel.address = address.value;
+    newHotel.checkIn = updatedHotel.checkIn;
+    newHotel.checkOut = updatedHotel.checkOut;
+    newHotel.latitude = updatedHotel.latitude;
+    newHotel.longitude = updatedHotel.longitude;
+  } else if (props.flag === "risto") {
+    const updatedRisto = {
+      ...newRisto, // Copy existing data
+      latitude,
+      longitude,
+    };
+    suggestions.value = [];
+    // Update the singleStop reactive object
+    newRisto.name = updatedRisto.name;
+    newRisto.address = address.value;
+
+    newRisto.latitude = updatedRisto.latitude;
+    newRisto.longitude = updatedRisto.longitude;
+  }
 };
 
-const saveStop = async () => {
+const saveItem = async () => {
   // console.log("Saving stop...");
   // console.log("newStop:", newStop); // Log the entire reactive object
   // console.log("Stop name:", newStop.title); // Log the specific property you need
+  if (props.flag === "stop") {
+    const stop = toRaw(newStop); // Convert to a plain object
+    //console.log("Raw stop:", stop);
 
-  const stop = toRaw(newStop); // Convert to a plain object
-  //console.log("Raw stop:", stop);
-
-  await tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
-  emit("close");
+    await tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
+    emit("close");
+  } else if (props.flag === "hotel") {
+    console.log(newHotel);
+    const hotel = toRaw(newHotel);
+    await tripsStore.addHotelToTrip(props.tripId, hotel);
+    emit("close");
+  } else if (props.flag === "risto") {
+    const risto = toRaw(newRisto);
+    console.log(risto);
+    await tripsStore.addRestaurantToTrip(props.tripId, risto);
+    emit("close");
+  }
 };
 </script>
 
 <template>
-  <div class="w-80 absolute top-20">
+  <form
+    class="w-full md:w-1/2 absolute top-0 md:right-1/3"
+    @submit.prevent="saveItem"
+  >
     <div
-      class="p-2 max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden"
+      class="p-2 md:p-5 mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-hidden md:text-lg"
     >
-      <h3 class="flex justify-between font-heading text-dark">
-        Add stop to the trip:
+      <h3 class="flex justify-between font-heading text-dark mt-1 md:text-2xl">
+        Add {{ props.flag }} to the trip:
         <PrimaryBtn
           class="close-button font-body text-xl"
           @click="$emit('close')"
@@ -125,8 +209,8 @@ const saveStop = async () => {
         >
       </h3>
 
-      <div class="mb-4">
-        <label class="block text-dark font-body mb-2" for="name"> Title </label>
+      <div class="mb-4" v-if="props.flag === 'stop'">
+        <label class="block text-dark font-body mb-2" for="name"> </label>
         <input
           v-model="newStop.title"
           class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
@@ -136,6 +220,33 @@ const saveStop = async () => {
           required
         />
       </div>
+      <div class="mb-4" v-if="props.flag === 'hotel'">
+        <label class="block text-dark font-body mb-2 capitalize" for="name">
+          {{ props.flag }} Name
+        </label>
+        <input
+          v-model="newHotel.name"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+          id="name"
+          type="text"
+          placeholder="Name of the Hotel here"
+          required
+        />
+      </div>
+      <div class="mb-4" v-if="props.flag === 'risto'">
+        <label class="block text-dark font-body mb-2 capitalize" for="name">
+          Restaurant Name
+        </label>
+        <input
+          v-model="newRisto.name"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+          id="name"
+          type="text"
+          placeholder="Name of the Restaurant here"
+          required
+        />
+      </div>
+
       <div class="mb-4">
         <label class="block text-dark font-body mb-2" for="name">
           Location
@@ -145,7 +256,11 @@ const saveStop = async () => {
           class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
           id="name"
           type="text"
-          placeholder="Location name city full address here"
+          :placeholder="
+            props.flag === 'stop'
+              ? 'Location name city full address here'
+              : 'Full Address'
+          "
           required
         />
         <ul
@@ -162,7 +277,7 @@ const saveStop = async () => {
           </li>
         </ul>
       </div>
-      <div class="mb-4">
+      <div v-if="props.flag == 'stop'" class="mb-4">
         <label class="block text-dark font-body mb-2" for="message">
           Description
         </label>
@@ -176,9 +291,53 @@ const saveStop = async () => {
           maxlength="5000"
         ></textarea>
       </div>
-      <PrimaryBtn @click="saveStop"> Save Stop </PrimaryBtn>
+      <div v-if="props.flag === 'hotel'">
+        <div class="mb-4">
+          <label class="block text-dark font-body mb-2" for="date">
+            Check-in Date
+          </label>
+          <input
+            v-model="newHotel.checkIn"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+            id="starDate"
+            type="date"
+            placeholder="Select a check-in date"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-dark font-body mb-2" for="date">
+            Check-out Date
+          </label>
+          <input
+            v-model="newHotel.checkOut"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+            id="starDate"
+            type="date"
+            placeholder="Select a check-in date"
+            required
+          />
+        </div>
+      </div>
+      <div class="mb-4" v-if="props.flag === 'risto'">
+        <label class="block text-dark font-body mb-2 capitalize" for="type">
+          Type of the restaurant
+        </label>
+        <input
+          v-model="newRisto.type"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+          id="type"
+          type="text"
+          placeholder="Italian or Chinese"
+        />
+      </div>
+
+      <PrimaryBtn type="submit" class="capitalize">
+        Save {{ props.flag }}
+      </PrimaryBtn>
     </div>
-  </div>
+  </form>
 </template>
 
 <style scoped></style>

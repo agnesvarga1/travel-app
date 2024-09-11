@@ -87,24 +87,17 @@ export const useTripsStore = defineStore("trips", {
       }
     },
     // Add a hotel to a trip both in local state and IndexedDB
-    async addHotelToTrip(tripId, dayIndex, hotel) {
+    async addHotelToTrip(tripId, hotel) {
       const trip = this.allTrips.find((trip) => trip.id === parseInt(tripId));
       if (trip) {
-        if (!trip.days || !trip.days[dayIndex]) {
-          console.error(
-            `Day with index ${dayIndex} not found in trip with ID ${tripId}.`
-          );
-          return;
-        }
-
         // Add the hotel to the specified day in the trip state
-        if (!trip.days[dayIndex].hotels) {
-          trip.days[dayIndex].hotels = [];
+        if (!trip.hotels) {
+          trip.hotels = [];
         }
-        trip.days[dayIndex].hotels.push(hotel);
+        trip.hotels.push(hotel);
 
         // Persist the hotel to IndexedDB
-        await addHotel(tripId, dayIndex, hotel);
+        await addHotel(tripId, hotel);
       } else {
         console.error(`Trip with ID ${tripId} not found.`);
       }
@@ -134,24 +127,17 @@ export const useTripsStore = defineStore("trips", {
     },
 
     // Add a restaurant to a trip both in local state and IndexedDB
-    async addRestaurantToTrip(tripId, dayIndex, restaurant) {
+    async addRestaurantToTrip(tripId, restaurant) {
       const trip = this.allTrips.find((trip) => trip.id === parseInt(tripId));
       if (trip) {
-        if (!trip.days || !trip.days[dayIndex]) {
-          console.error(
-            `Day with index ${dayIndex} not found in trip with ID ${tripId}.`
-          );
-          return;
-        }
-
         // Add the restaurant to the specified day in the trip state
-        if (!trip.days[dayIndex].restaurants) {
-          trip.days[dayIndex].restaurants = [];
+        if (!trip.restaurants) {
+          trip.restaurants = [];
         }
-        trip.days[dayIndex].restaurants.push(restaurant);
+        trip.restaurants.push(restaurant);
 
         // Persist the restaurant to IndexedDB
-        await addRestaurant(tripId, dayIndex, restaurant);
+        await addRestaurant(tripId, restaurant);
       } else {
         console.error(`Trip with ID ${tripId} not found.`);
       }

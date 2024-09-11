@@ -155,7 +155,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="bg-light rounded-t-lg mt-14 p-3 main-container md:w-2/3 md:mx-auto"
+    class="bg-light rounded-t-lg mt-14 p-3 main-container md:w-2/3 md:mx-auto md:text-lg"
   >
     <div v-if="trip" class="">
       <div class="md:flex">
@@ -215,6 +215,7 @@ onMounted(() => {
         :itemId="currentIndex"
         :flag="flag"
       />
+
       <h2 class="font-heading text-dark" v-if="trip.days">Stops:</h2>
       <div
         class="mt-2 md:flex md:items-center md:gap-2"
@@ -236,17 +237,20 @@ onMounted(() => {
         </div>
         <div class="md:flex md:flex-col md:gap-2 md:w-2/3">
           <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
-          <PrimaryBtn class="self-start" @click="openAddStops(dayIndex)"
+          <PrimaryBtn class="self-start" @click="openAddStops(dayIndex, stopF)"
             >Add Stop</PrimaryBtn
           >
         </div>
 
         <div
-          class="w-full flex shadow-xl rounded-md overflow-hidden"
+          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between"
           v-for="(stop, stopIndex) in day.stops"
           :key="stopIndex"
         >
-          <DayCard class="relative md:w-1/2">
+          <DayCard
+            class="relative"
+            :class="`md:w-[calc(100% / ${day.stops.length} )]`"
+          >
             <template v-slot:header>
               <svg
                 @click="checkVisited(stop, tripId, stopIndex, dayIndex)"
@@ -272,13 +276,16 @@ onMounted(() => {
             </template>
             <template v-slot:body>
               <div class="p-2 font-body text-dark">
-                <h3 class="font-heading text-secondary text-sm">
+                <h3 class="font-heading text-secondary text-sm md:text-xl">
                   {{ stop.title }}
                 </h3>
-                <p class="text-dark font-body text-xs">
+                <p class="text-dark font-body text-xs md:text-lg">
                   {{ stop.description }}
                 </p>
-                <p v-if="stop.notes" class="text-dark font-body text-xs mt-1">
+                <p
+                  v-if="stop.notes"
+                  class="text-dark font-body text-xs mt-1 md:text-lg"
+                >
                   <strong>Notes:</strong>
                   {{ stop.notes }}
                 </p>
@@ -291,24 +298,15 @@ onMounted(() => {
             ><i class="fa-solid fa-trash-can"></i
           ></PrimaryBtn>
         </div>
-
-        <!-- ADD STOP MODAL -->
-        <AddStopModal
-          v-if="isStopModal"
-          @close="closeAddStop"
-          :trip-id="trip.id"
-          :day-index="currentDayIndex"
-          :flag="flag"
-        />
       </div>
       <!-- Hotels and Ristos -->
       <h2 class="font-heading text-dark pt-2" v-if="trip.endDate">Stays:</h2>
       <div v-if="trip.endDate">
-        <PrimaryBtn class="font-">Add Stay</PrimaryBtn>
+        <PrimaryBtn @click="openAddStops(_, hotelF)">Add Stay</PrimaryBtn>
       </div>
       <div class="mt-2 md:flex md:items-center md:gap-2">
         <div
-          class="w-full flex shadow-xl rounded-md overflow-hidden"
+          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2"
           v-for="(hotel, hotelIndex) in trip.hotels"
           :key="hotelIndex"
         >
@@ -345,10 +343,12 @@ onMounted(() => {
       </div>
 
       <h2 class="font-heading text-dark pt-3">Eats:</h2>
-      <div><PrimaryBtn>Add risto</PrimaryBtn></div>
+      <div>
+        <PrimaryBtn @click="openAddStops(_, ristoF)">Add risto</PrimaryBtn>
+      </div>
       <div class="mt-2 md:flex md:items-center md:gap-2">
         <div
-          class="w-full flex shadow-xl rounded-md overflow-hidden"
+          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2"
           v-for="(risto, ristoIndex) in trip.restaurants"
           :key="ristoIndex"
         >
@@ -425,6 +425,15 @@ onMounted(() => {
       @close="isModal = false"
     />
   </div>
+  <!-- ADD STOP MODAL -->
+  <AddStopModal
+    class="z-10"
+    v-if="isStopModal"
+    @close="closeAddStop"
+    :trip-id="trip.id"
+    :day-index="currentDayIndex"
+    :flag="flag"
+  />
 </template>
 
 <style scoped>

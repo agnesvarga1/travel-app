@@ -158,9 +158,7 @@ export const addHotel = async (tripId, hotel) => {
 
     // Store the updated trip back in the store
     await store.put(trip);
-    console.log(
-      `Hotel added successfully to day ${dayIndex} of trip with ID ${tripId}.`
-    );
+    console.log(`Hotel added successfully to trip with ID ${tripId}.`);
   } else {
     console.error(`Trip with ID ${tripId} not found.`);
   }
