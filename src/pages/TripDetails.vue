@@ -28,6 +28,7 @@ const isStopModal = ref(false);
 const isDeleteModal = ref(false);
 const currentDayIndex = ref(null);
 const currentIndex = ref(null);
+const currentName = ref("");
 let stopF = "stop";
 let hotelF = "hotel";
 let ristoF = "risto";
@@ -52,13 +53,10 @@ const openMap = (day) => {
 
   if (trip.value.hotels && trip.value.hotels.length > 0) {
     const dayDate = moment(day.date);
-    console.log(trip.value.hotels);
 
     selectedHotel.value = trip.value.hotels.find((hotel) => {
-      console.log(hotel);
       const checkInDate = moment(hotel.checkIn);
       const checkOutDate = moment(hotel.checkOut);
-
       return dayDate.isBetween(checkInDate, checkOutDate, "days", "[]");
     });
   } else {
@@ -126,13 +124,13 @@ const closeAddStop = () => {
   currentDayIndex.value = null;
 };
 
-const openDeleteModal = (di, i, f) => {
+const openDeleteModal = (di, i, f, n) => {
   isDeleteModal.value = true;
 
   currentDayIndex.value = di;
 
   currentIndex.value = i;
-
+  currentName.value = n;
   flag = f;
 };
 
@@ -140,6 +138,7 @@ const closeDeleteModal = () => {
   isDeleteModal.value = false;
   currentDayIndex.value = null;
   currentIndex.value = null;
+  currentName.value = "";
 };
 
 onMounted(() => {
@@ -156,38 +155,48 @@ onMounted(() => {
 });
 </script>
 
-<template>
+<template class="relative">
   <div
-    class="bg-light rounded-t-lg mt-14 p-3 main-container md:w-2/3 md:mx-auto md:text-lg"
+    v-if="isDeleteModal || isStopModal || isNoteModal"
+    class="top-0 bottom-0 bg-black bg-opacity-50 absolute lg:w-10/12 z-10 w-full"
+  ></div>
+  <div
+    class="bg-light rounded-t-lg mt-14 p-3 main-container md:text-lg lg:px-20 relative"
+    :class="{ 'overflow-hidden': isDeleteModal || isStopModal || isNoteModal }"
   >
-    <div v-if="trip" class="">
-      <div class="md:flex">
-        <div class="flex">
-          <figure class="w-24 md:w-40">
-            <img :src="getImageSrc(trip.cover)" alt="cover image" />
+    <div v-if="trip">
+      <div class="lg:flex">
+        <div class="flex md:w-10/11">
+          <figure class="w-44 rounded-md overflow-hidden lg:w-full md:w-full">
+            <img
+              class="lg:w-full"
+              :src="getImageSrc(trip.cover)"
+              alt="cover image"
+            />
           </figure>
-          <div class="text-xs p-3 pt-1 text-dark font-body md:w-80">
+
+          <div class="text-xs p-3 pt-1 text-dark font-body md:w-full">
             <h1
-              class="text-accent text-xl font-semibold font-heading md:text-3xl"
+              class="text-accent text-xl font-semibold font-heading md:text-4xl"
             >
               {{ trip.title }}
             </h1>
-            <p>
+            <p class="md:text-xl">
               <span v-if="trip.endDate"> From:</span> <span v-else>On:</span>
               {{ trip.startDate }}
             </p>
-            <p v-if="trip.endDate">To: {{ trip.endDate }}</p>
+            <p class="md:text-xl" v-if="trip.endDate">To: {{ trip.endDate }}</p>
           </div>
         </div>
 
-        <div class="flex">
-          <div class="py-1">
-            <p class="text-dark font-body text-sm md:text-l">
+        <div class="lg:w-1/2">
+          <div class="py-1 md:w-full">
+            <p class="text-dark font-body text-sm md:text-2xl">
               <strong>Description:</strong> {{ trip.description }}
             </p>
             <div
               v-if="trip.notes"
-              class="text-dark font-body text-sm mt-2 flex justify-between items-start"
+              class="text-dark font-body text-sm mt-2 flex justify-between items-start md:text-2xl"
             >
               <p>
                 <strong>Notes:</strong> <br />
@@ -198,9 +207,11 @@ onMounted(() => {
               </PrimaryBtn>
             </div>
             <!-- If No notes -->
-            <p class="text-dark font-body mt-2" v-else>
+            <p class="text-dark font-body md:text-2xl mt-2" v-else>
               <strong>Add Notes: </strong>
-              <PrimaryBtn @click="isNoteModal = true" class="text-xl ms-2"
+              <PrimaryBtn
+                @click="isNoteModal = true"
+                class="text-xl md:text-2xl ms-2 md:w-12 aspect-square"
                 ><i class="fa-solid fa-pencil"></i
               ></PrimaryBtn>
             </p>
@@ -209,28 +220,25 @@ onMounted(() => {
       </div>
 
       <!-- Stops -->
-      <!-- DELETE MODAL -->
-      <DeleteModal
-        v-if="isDeleteModal"
-        @close="closeDeleteModal"
-        :tripId="trip.id"
-        :dayIndex="currentDayIndex"
-        :itemId="currentIndex"
-        :flag="flag"
-      />
-
-      <h2 class="font-heading text-dark" v-if="trip.days">Stops:</h2>
+      <h2
+        class="font-heading text-dark font-bold md:text-2xl mt-2"
+        v-if="trip.days"
+      >
+        Stops:
+      </h2>
       <div
-        class="mt-2 md:flex md:items-center md:gap-2"
+        class="mt-2 md:flex md:flex-col md:start md:gap-2 md:mt-4"
         v-for="(day, dayIndex) in trip.days"
         :key="dayIndex"
       >
-        <div class="flex justify-between md:block">
-          <h1 class="font-heading text-dark text-lg">Day {{ dayIndex + 1 }}</h1>
+        <div class="flex justify-between md:justify-start md:gap-4">
+          <h1 class="font-heading text-dark text-lg md:text-3xl">
+            Day {{ dayIndex + 1 }}
+          </h1>
           <div v-if="day.stops.length > 0" @click="openMap(day)">
             <font-awesome-icon
               :class="{
-                'bg-primary rounded-md p-2 text-xl text-light self-start cursor-pointer hover:bg-dark':
+                'bg-primary rounded-md p-2 md:p-4 text-xl md:text-2xl text-light self-start cursor-pointer hover:bg-dark ':
                   canShowMap,
                 'opacity-50 pointer-events-none': !canShowMap,
               }"
@@ -239,81 +247,88 @@ onMounted(() => {
           </div>
         </div>
         <div class="md:flex md:flex-col md:gap-2 md:w-2/3">
-          <h3 class="font-heading text-dark">date:{{ day.date }}</h3>
+          <h3 class="font-heading text-dark md:text-xl">date:{{ day.date }}</h3>
           <PrimaryBtn class="self-start" @click="openAddStops(dayIndex, stopF)"
             >Add Stop</PrimaryBtn
           >
         </div>
-
-        <div
-          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between"
-          v-for="(stop, stopIndex) in day.stops"
-          :key="stopIndex"
-        >
-          <DayCard
-            class="relative"
-            :class="`md:w-[calc(100% / ${day.stops.length} )]`"
+        <div class="md:flex md:items-stretch md:flex-wrap">
+          <div
+            class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2 lg:w-1/3 relative"
+            v-for="(stop, stopIndex) in day.stops"
+            :key="stopIndex"
           >
-            <template v-slot:header>
-              <svg
-                @click="checkVisited(stop, tripId, stopIndex, dayIndex)"
-                id="visited-icon"
-                :class="{ active: stop.visited }"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
-                />
-              </svg>
-
-              <svg
-                class="fill-dark"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M240.1 4.2c9.8-5.6 21.9-5.6 31.8 0l171.8 98.1L448 104l0 .9 47.9 27.4c12.6 7.2 18.8 22 15.1 36s-16.4 23.8-30.9 23.8L32 192c-14.5 0-27.2-9.8-30.9-23.8s2.5-28.8 15.1-36L64 104.9l0-.9 4.4-1.6L240.1 4.2zM64 224l64 0 0 192 40 0 0-192 64 0 0 192 48 0 0-192 64 0 0 192 40 0 0-192 64 0 0 196.3c.6 .3 1.2 .7 1.8 1.1l48 32c11.7 7.8 17 22.4 12.9 35.9S494.1 512 480 512L32 512c-14.1 0-26.5-9.2-30.6-22.7s1.1-28.1 12.9-35.9l48-32c.6-.4 1.2-.7 1.8-1.1L64 224z"
-                />
-              </svg>
-            </template>
-            <template v-slot:body>
-              <div class="p-2 font-body text-dark">
-                <h3 class="font-heading text-secondary text-sm md:text-xl">
-                  {{ stop.title }}
-                </h3>
-                <p class="text-dark font-body text-xs md:text-lg">
-                  {{ stop.description }}
-                </p>
-                <p
-                  v-if="stop.notes"
-                  class="text-dark font-body text-xs mt-1 md:text-lg"
+            <DayCard class="relative" :modal="isDeleteModal">
+              <template v-slot:header>
+                <svg
+                  @click="checkVisited(stop, tripId, stopIndex, dayIndex)"
+                  id="visited-icon"
+                  :class="{ active: stop.visited }"
+                  class=""
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
                 >
-                  <strong>Notes:</strong>
-                  {{ stop.notes }}
-                </p>
-              </div>
-            </template>
-          </DayCard>
-          <PrimaryBtn
-            @click="openDeleteModal(dayIndex, stopIndex, stopF)"
-            class="top-0 right-0 self-start m-2"
-            ><i class="fa-solid fa-trash-can"></i
-          ></PrimaryBtn>
+                  <path
+                    d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+                  />
+                </svg>
+
+                <svg
+                  class="fill-dark"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    d="M240.1 4.2c9.8-5.6 21.9-5.6 31.8 0l171.8 98.1L448 104l0 .9 47.9 27.4c12.6 7.2 18.8 22 15.1 36s-16.4 23.8-30.9 23.8L32 192c-14.5 0-27.2-9.8-30.9-23.8s2.5-28.8 15.1-36L64 104.9l0-.9 4.4-1.6L240.1 4.2zM64 224l64 0 0 192 40 0 0-192 64 0 0 192 48 0 0-192 64 0 0 192 40 0 0-192 64 0 0 196.3c.6 .3 1.2 .7 1.8 1.1l48 32c11.7 7.8 17 22.4 12.9 35.9S494.1 512 480 512L32 512c-14.1 0-26.5-9.2-30.6-22.7s1.1-28.1 12.9-35.9l48-32c.6-.4 1.2-.7 1.8-1.1L64 224z"
+                  />
+                </svg>
+              </template>
+              <template v-slot:body>
+                <div class="p-2 font-body text-dark">
+                  <h3 class="font-heading text-accent text-sm md:text-2xl">
+                    {{ stop.title }}
+                  </h3>
+                  <p class="text-dark font-body text-xs md:text-xl">
+                    {{ stop.description }}
+                  </p>
+                  <p
+                    v-if="stop.notes"
+                    class="text-dark font-body text-xs mt-1 md:text-lg"
+                  >
+                    <strong>Notes:</strong>
+                    {{ stop.notes }}
+                  </p>
+                </div>
+              </template>
+            </DayCard>
+
+            <div class="flex items-start md:absolute md:top-1 md:right-1">
+              <PrimaryBtn
+                @click="openDeleteModal(dayIndex, stopIndex, stopF, stop.title)"
+                class="felx justify-center items-center p-2 m-2 md:w-10 md:text-2xl bin"
+                ><i class="fa-solid fa-trash-can"></i
+              ></PrimaryBtn>
+            </div>
+          </div>
         </div>
       </div>
       <!-- Hotels and Ristos -->
-      <h2 class="font-heading text-dark pt-2" v-if="trip.endDate">Stays:</h2>
+      <h2
+        class="font-heading text-dark pt-2 font-bold my-2"
+        v-if="trip.endDate"
+      >
+        Stays:
+      </h2>
       <div v-if="trip.endDate">
         <PrimaryBtn @click="openAddStops(_, hotelF)">Add Stay</PrimaryBtn>
       </div>
-      <div class="mt-2 md:flex md:items-center md:gap-2">
+      <div class="mt-2 md:flex md:flex-wrap">
         <div
-          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2"
+          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2 lg:w-1/3 relative"
           v-for="(hotel, hotelIndex) in trip.hotels"
           :key="hotelIndex"
         >
-          <DayCard v-if="trip.hotels">
+          <DayCard class="relative" v-if="trip.hotels">
             <template v-slot:header
               ><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                 <path
@@ -323,39 +338,47 @@ onMounted(() => {
             </template>
             <template v-slot:body>
               <div class="font-body text-dark p-2">
-                <h3 class="font-heading text-secondary xt-l">
+                <h3 class="font-heading text-accent text-lg md:text-2xl">
                   {{ hotel.name }}
                 </h3>
-                <p class="text-xs">
+                <p class="text-xs md:text-lg">
                   <i class="fa-solid fa-map-pin"></i> {{ hotel.address }}
                 </p>
-                <p class="text-xs">Check-In Date: {{ hotel.checkIn }}</p>
-                <p class="text-xs">Check-Out Date: {{ hotel.checkOut }}</p>
+                <p class="text-xs md:text-lg">
+                  Check-In Date: {{ hotel.checkIn }}
+                </p>
+                <p class="text-xs md:text-lg">
+                  Check-Out Date: {{ hotel.checkOut }}
+                </p>
               </div>
             </template>
           </DayCard>
-          <div class="flex items-center top-0 right-0 self-start">
+          <div
+            class="flex items-center self-start md:absolute md:top-1 md:right-1"
+          >
             <PrimaryBtn
               v-if="trip.hotels"
-              @click="openDeleteModal(_, hotelIndex, hotelF)"
-              class="m-2"
+              @click="openDeleteModal(_, hotelIndex, hotelF, hotel.name)"
+              class="felx justify-center items-center p-2 m-2 md:w-10 md:text-2xl bin"
               ><i class="fa-solid fa-trash-can"></i
             ></PrimaryBtn>
           </div>
         </div>
       </div>
-
-      <h2 class="font-heading text-dark pt-3">Eats:</h2>
+      <!-- RESTAURANT SECTION -->
+      <h2 class="font-heading text-dark pt-3 md:my-3 font-bold md:font-xl">
+        Eats:
+      </h2>
       <div>
         <PrimaryBtn @click="openAddStops(_, ristoF)">Add risto</PrimaryBtn>
       </div>
-      <div class="mt-2 md:flex md:items-center md:gap-2">
+      <div class="mt-2 md:flex md:items-center md:flex-wrap">
         <div
-          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2"
+          class="w-full flex shadow-xl rounded-md overflow-hidden justify-between md:w-1/2 lg:w-1/3 md:relative"
           v-for="(risto, ristoIndex) in trip.restaurants"
           :key="ristoIndex"
         >
-          <DayCard v-if="trip.restaurants">
+          <DayCard class="md:w-full" v-if="trip.restaurants">
             <template v-slot:header>
               <svg
                 class="cursor-pointer"
@@ -369,58 +392,32 @@ onMounted(() => {
             </template>
             <template v-slot:body>
               <div class="ps-2 font-body text-dark p-2">
-                <h3 class="font-heading text-secondary text-l">
+                <h3 class="font-heading text-accent text-lg md:text-2xl">
                   {{ risto.name }}
                 </h3>
-                <p class="text-xs">
+                <p class="text-xs md:text-lg">
                   <i class="fa-solid fa-map-pin"></i> {{ risto.address }}
                 </p>
-                <p class="text-xs">
+                <p class="text-xs md:text-lg">
                   <i class="fa-solid fa-plate-wheat"></i> {{ risto.type }}
                 </p>
               </div>
             </template>
           </DayCard>
-          <div class="flex justify-end top-0 right-0 items-start">
+          <div
+            class="flex justify-end items-start md:absolute md:top-1 md:right-1"
+          >
             <PrimaryBtn
               v-if="trip.hotels"
-              @click="openDeleteModal(_, ristoIndex, ristoF)"
-              class="m-2"
+              @click="openDeleteModal(_, ristoIndex, ristoF, risto.name)"
+              class="felx justify-center items-center p-2 m-2 md:w-10 md:text-2xl bin"
               ><i class="fa-solid fa-trash-can"></i
             ></PrimaryBtn>
           </div>
         </div>
       </div>
     </div>
-    <!-- NOTE MODAL -->
-    <div
-      v-if="isNoteModal"
-      class="note-modal absolute top-10 w-80 bg-white flex flex-col align-center p-3 md:w-1/2 md:top"
-    >
-      <h3 class="flex justify-between p-2 font-heading text-dark">
-        Add Note
-        <PrimaryBtn
-          class="close-button font-body text-xl"
-          @click="isNoteModal = false"
-          >X</PrimaryBtn
-        >
-      </h3>
-      <textarea
-        v-model="note"
-        class="w-full border-2 border-gray-300 rounded-md p-1 font-body"
-        cols="20"
-        rows="10"
-        :placeholder="trip.notes === '' ? 'example note' : ''"
-        >{{ trip.notes }}</textarea
-      >
-      <div>
-        <PrimaryBtn
-          class="mt-2 focus:outline-none focus:border-dark"
-          @click="submitNote(tripId, note)"
-          >Submit Note</PrimaryBtn
-        >
-      </div>
-    </div>
+
     <RouteMap
       v-if="isModal"
       :stops="selectedDayStops"
@@ -428,6 +425,16 @@ onMounted(() => {
       @close="isModal = false"
     />
   </div>
+  <!-- DELETE MODAL -->
+  <DeleteModal
+    v-if="isDeleteModal"
+    @close="closeDeleteModal"
+    :tripId="trip.id"
+    :dayIndex="currentDayIndex"
+    :itemId="currentIndex"
+    :flag="flag"
+    :name="currentName"
+  />
   <!-- ADD STOP MODAL -->
   <AddStopModal
     class="z-10"
@@ -437,6 +444,35 @@ onMounted(() => {
     :day-index="currentDayIndex"
     :flag="flag"
   />
+  <!-- NOTE MODAL -->
+  <div
+    v-if="isNoteModal"
+    class="modal rounded-lg w-80 bg-white flex flex-col align-center p-3 md:w-10/12 absolute top-14 md:top-1/4 left-1/2 z-20"
+  >
+    <h3 class="flex justify-between p-2 font-heading text-dark md:text-3xl">
+      Add Note
+      <PrimaryBtn
+        class="close-button font-body text-xl"
+        @click="isNoteModal = false"
+        >X</PrimaryBtn
+      >
+    </h3>
+    <textarea
+      v-model="note"
+      class="w-full border-2 border-gray-300 rounded-md font-body p-2 md:text-xl"
+      cols="20"
+      rows="10"
+      :placeholder="trip.notes !== undefined ? '' : 'trip notes here'"
+      >{{ trip.notes }}</textarea
+    >
+    <div>
+      <PrimaryBtn
+        class="mt-2 focus:outline-none focus:border-dark"
+        @click="submitNote(tripId, note)"
+        >Submit Note</PrimaryBtn
+      >
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -457,5 +493,12 @@ svg {
 }
 .active {
   fill: #ff8474 !important;
+}
+@media only screen and (min-width: 768px) {
+  .bin {
+    aspect-ratio: 1;
+    padding: 0;
+    width: 3rem;
+  }
 }
 </style>

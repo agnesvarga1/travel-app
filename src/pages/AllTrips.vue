@@ -22,10 +22,18 @@ watch(
 </script>
 
 <template>
-  <div
-    class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl md:flex md:items-start md:justify-center"
-  >
-    <TripCard v-for="trip in trips" :trip="trip" :key="trip.id" />
+  <div class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl">
+    <h1 class="text-2xl md:text-4xl text-accent text-center xl:pt-20 mb-3">
+      List of all saved trips
+    </h1>
+    <div class="md:flex md:flex-wrap md:items-start lg:justify-center">
+      <TripCard
+        class="md:w-1/2"
+        v-for="trip in trips"
+        :trip="trip"
+        :key="trip.id"
+      />
+    </div>
   </div>
 </template>
 

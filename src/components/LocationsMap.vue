@@ -83,7 +83,7 @@ onUpdated(() => {
 
 <template>
   <div
-    class="modal-overlay fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
+    class="modal-overlay fixed top-0 z-10 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50"
   >
     <div class="modal-container rounded-lg" style="width: 80%; height: 80%">
       <PrimaryBtn

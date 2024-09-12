@@ -8,7 +8,7 @@
 }
 
 .main-container {
-  height: calc(100% - 120px);
+  height: calc(100% - 112px);
   overflow-x: auto;
 }
 img {
@@ -16,4 +16,7 @@ img {
 }
 .thumb {
   max-width: 120px;
+}
+.modal {
+  transform: translateX(-50%);
 }

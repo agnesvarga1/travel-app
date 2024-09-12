@@ -40,53 +40,76 @@ onMounted(() => {
 </script>
 <template>
   <div
-    class="trip-card w-80 mx-auto shadow-lg mt-3 rounded-lg overflow-hidden realtive"
+    class="trip-card max-w-md mx-auto shadow-lg mt-3 rounded-lg overflow-hidden realtive"
   >
-    <div class="card-header">
-      <img :src="getImageSrc(trip.cover)" :alt="trip.title" />
-    </div>
-    <div class="card-body p-2">
-      <div class="flex justify-between">
-        <div class="text-sm mb-2">
-          <h2 class="text-primary font-heading text-xl">{{ trip.title }}</h2>
-
-          <span class="font-body">From: {{ trip.startDate }} </span><br />
-          <span class="font-body"> To: {{ trip.endDate }}</span>
-        </div>
-        <div
-          @click="isModal = true"
-          :class="{
-            'bg-primary rounded-md p-2 text-xl text-light self-start cursor-pointer hover:bg-dark':
-              !isDisabled,
-            'opacity-50 pointer-events-none': isDisabled,
-          }"
-        >
-          <font-awesome-icon :icon="['fas', 'map-location-dot']" />
+    <div class="md:flex md:flex-col md:jusify-between relative">
+      <div class="card-header">
+        <img :src="getImageSrc(trip.cover)" :alt="trip.title" />
+      </div>
+      <div
+        v-if="isDeleteModal"
+        class="top-0 bottom-0 bg-black bg-opacity-50 absolute w-full z-20"
+      ></div>
+      <div
+        v-if="isDeleteModal"
+        class="modal mx-auto mt-20 bg-white shadow-lg p-3 rounded-lg w-80 top-1/3 left-1/2 absolute z-50"
+      >
+        <h2 class="font-heading text-dark text-xl">
+          Are you sure to DELETE this
+          <span class="text-accent uppercase">{{ props.trip.title }} </span>
+          trip?
+        </h2>
+        <div class="flex justify-end gap-1 mt-3">
+          <PrimaryBtn @click="tripsStore.deleteTripFromDB(trip.id)"
+            >Delete</PrimaryBtn
+          >
+          <SecondaryBtn @click="isDeleteModal = false">Cancel</SecondaryBtn>
         </div>
       </div>
+      <div class="card-body p-2 relative">
+        <!-- DELETE TRIP MODAL -->
 
-      <p class="text-sm font-body leading-5">{{ trip.description }}</p>
-      <LocationsMap v-if="isModal" @close="isModal = false" :id="trip.id" />
-    </div>
-    <div class="card-footer p-3 flex justify-center flex-col gap-1">
-      <PrimaryBtn class="w-full">
-        <router-link :to="{ name: 'TripDetails', params: { id: trip.id } }">
-          View Details
-        </router-link>
-      </PrimaryBtn>
-      <SecondaryBtn @click="isDeleteModal = true">Delete Trip</SecondaryBtn>
-    </div>
-    <div
-      v-if="isDeleteModal"
-      class="max-w-md mx-auto mt-20 bg-white shadow-lg p-2 rounded-lg absolute w-80 top-14"
-    >
-      <h2 class="font-heading text-dark">Are you sure to DELETE this item?</h2>
-      <div class="flex justify-end gap-1">
-        <PrimaryBtn @click="tripsStore.deleteTripFromDB(trip.id)"
-          >Delete</PrimaryBtn
-        >
-        <SecondaryBtn @click="isDeleteModal = false">Cancel</SecondaryBtn>
+        <div class="flex justify-between">
+          <div class="text-sm mb-2">
+            <h2 class="text-primary font-heading text-xl md:text-3xl">
+              {{ trip.title }}
+            </h2>
+
+            <span class="font-body text-dark md:text-xl"
+              >From: {{ trip.startDate }} </span
+            ><br />
+            <span class="font-body md:text-xl"> To: {{ trip.endDate }}</span>
+          </div>
+          <div
+            @click="isModal = true"
+            :class="{
+              'bg-primary rounded-md p-2 text-xl  text-light self-start cursor-pointer hover:bg-dark':
+                !isDisabled,
+              'opacity-50 pointer-events-none': isDisabled,
+            }"
+          >
+            <font-awesome-icon :icon="['fas', 'map-location-dot']" />
+          </div>
+        </div>
+
+        <p class="text-sm md:text-2xl font-body leading-5">
+          {{ trip.description }}
+        </p>
+      </div>
+      <div class="card-footer p-3 flex flex-col gap-1">
+        <PrimaryBtn class="w-full">
+          <router-link :to="{ name: 'TripDetails', params: { id: trip.id } }">
+            View Details
+          </router-link>
+        </PrimaryBtn>
+        <SecondaryBtn @click="isDeleteModal = true">Delete Trip</SecondaryBtn>
       </div>
     </div>
   </div>
+  <LocationsMap v-if="isModal" @close="isModal = false" :id="trip.id" />
 </template>
+<style scoped>
+.modal {
+  transform: translateX(-50%);
+}
+</style>

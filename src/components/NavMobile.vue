@@ -10,7 +10,7 @@ const isActive = (path) => {
 
 <template>
   <div
-    class="fixed bottom-0 left-0 w-full h-16 bg-dark p-2 rounded-t-lg flex justify-around items-center"
+    class="fixed bottom-0 left-0 w-full h-14 bg-dark p-2 rounded-t-lg flex justify-around items-center"
   >
     <router-link
       :to="{ name: 'home' }"

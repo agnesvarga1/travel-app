@@ -113,10 +113,10 @@ const saveTrip = async () => {
 <template>
   <div class="overflow-auto pb-20">
     <div
-      class="max-w-md mx-auto mt-20 bg-white shadow-lg rounded-lg overflow-auto"
+      class="max-w-md mx-auto md:mt-20 mt-12 bg-white shadow-lg rounded-lg overflow-auto"
     >
       <div
-        class="text-2xl py-4 px-6 bg-accent text-white text-center font-heading uppercase"
+        class="md:text-2xl xs:text-lg py-2 md:py-4 px-6 bg-accent text-white text-center font-heading uppercase"
       >
         Add a new trip
       </div>

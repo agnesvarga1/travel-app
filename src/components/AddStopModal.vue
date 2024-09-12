@@ -71,26 +71,30 @@ const validateDates = (date1, date2) => {
   const startDate = moment(trip.startDate).format("YYYY-MM-DD");
 
   let dateExists;
+  if (trip.hotels) {
+    trip.hotels.forEach((hotel) => {
+      // console.log(date1 == hotel.checkIn);
+      let isPeriod = false;
+      let date = moment(hotel.checkOut)
+        .subtract(1, "days")
+        .format("YYYY-MM-DD");
 
-  trip.hotels.forEach((hotel) => {
-    // console.log(date1 == hotel.checkIn);
-    let isPeriod = false;
-    let date = moment(hotel.checkOut).subtract(1, "days").format("YYYY-MM-DD");
+      if (
+        moment(date1).isBetween(hotel.checkIn, date) ||
+        moment(date2).isBetween(hotel.checkIn, hotel.checkOut)
+      ) {
+        isPeriod = true;
+      }
 
-    if (
-      moment(date1).isBetween(hotel.checkIn, date) ||
-      moment(date2).isBetween(hotel.checkIn, hotel.checkOut)
-    ) {
-      isPeriod = true;
-    }
+      //if date exist
+      if (date1 == hotel.checkIn || date2 == hotel.checkOut || isPeriod) {
+        dateExists = true;
+      } else {
+        dateExists = false;
+      }
+    });
+  }
 
-    //if date exist
-    if (date1 == hotel.checkIn || date2 == hotel.checkOut || isPeriod) {
-      dateExists = true;
-    } else {
-      dateExists = false;
-    }
-  });
   //console.log(moment(date1).isAfter(moment(startDate)));
   if (
     (moment(date1).isAfter(moment(startDate)) ||
@@ -235,8 +239,6 @@ const saveItem = async () => {
   // console.log("Stop name:", newStop.title); // Log the specific property you need
   if (props.flag === "stop") {
     const stop = toRaw(newStop); // Convert to a plain object
-    console.log("Raw stop:", stop);
-
     await tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
     emit("close");
   } else if (props.flag === "hotel") {
@@ -252,7 +254,6 @@ const saveItem = async () => {
     }
   } else if (props.flag === "risto") {
     const risto = toRaw(newRisto);
-    console.log(risto);
     await tripsStore.addRestaurantToTrip(props.tripId, risto);
     emit("close");
   }

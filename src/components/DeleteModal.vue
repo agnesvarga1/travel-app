@@ -1,7 +1,7 @@
 <script setup>
 import PrimaryBtn from "./PrimaryBtn.vue";
 import SecondaryBtn from "./SecondaryBtn.vue";
-import { onMounted, defineEmits } from "vue";
+
 import { useTripsStore } from "../stores/trips";
 
 const tripsStore = useTripsStore();
@@ -20,9 +20,12 @@ const props = defineProps({
   flag: {
     type: String,
   },
+  name: {
+    type: String,
+  },
 });
 
-const emit = defineEmits(["close"]); // Correctly define the emits
+const emit = defineEmits(["close"]);
 
 // onMounted(() => {
 //   console.log(props);
@@ -51,10 +54,14 @@ const deleteItem = async () => {
 <template>
   <!-- DELETE MODAL -->
   <div
-    class="max-w-md mx-auto mt-20 bg-white shadow-lg p-2 rounded-lg absolute w-80 top-14 z-10"
+    class="modal mx-auto w-80 mt-20 bg-white shadow-lg p-2 md:p-10 rounded-lg absolute top-14 md:top-1/3 left-1/2 z-20 md:w-2/4"
   >
-    <h2 class="font-heading text-dark">Are you sure to DELETE this item?</h2>
-    <div class="flex justify-end gap-1">
+    <h2 class="font-heading text-dark xl:text-3xl">
+      Are you sure to DELETE this
+      <span class="text-accent uppercase">{{ props.flag }}</span> with name
+      {{ props.name }}?
+    </h2>
+    <div class="flex justify-end gap-1 mt-3">
       <PrimaryBtn @click="deleteItem()">Delete</PrimaryBtn>
       <SecondaryBtn @click="$emit('close')">Cancel</SecondaryBtn>
     </div>
