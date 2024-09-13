@@ -10,7 +10,7 @@ const successMessage = ref("");
 const errMsg = ref("");
 const now = moment().format("YYYY-MM-DD");
 const datesArray = ref([]);
-const isValidEndDate = ref(null);
+const isValidEndDate = ref(true);
 const isValidStartDate = ref(null);
 const daysToSign = reactive([]);
 const newTrip = reactive({
@@ -25,9 +25,9 @@ const newTrip = reactive({
 const calculateDays = (startDate, endDate) => {
   datesArray.value = [];
 
-  if (isOneDay.value || !endDate) {
+  if (isOneDay.value === true || !endDate) {
     datesArray.value.push(moment(startDate).format("YYYY-MM-DD"));
-  } else if (startDate && endDate) {
+  } else if (startDate && endDate && isOneDay.value === false) {
     let currentDate = moment(startDate).format("YYYY-MM-DD");
     const formattedEndDate = moment(endDate).format("YYYY-MM-DD");
 
@@ -74,16 +74,20 @@ watch(
   [() => newTrip.startDate, () => newTrip.endDate],
   ([startDate, endDate]) => {
     errMsg.value = "";
-    isValidEndDate.value = null;
-    if (moment(newTrip.endDate).isAfter(newTrip.startDate)) {
-      isValidEndDate.value = true;
-      calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
+    isValidEndDate.value = true;
+    if (isOneDay) {
+      calculateDays(startDate, endDate); // Treat as a one-day trip
     } else {
-      if (moment(endDate).isBefore(newTrip.startDate)) {
-        isValidEndDate.value = false;
-        errMsg.value = "End date can not before the start date";
-      } else if (moment(newTrip.startDate).isBefore(now)) {
-        errMsg.value = "Start date can not be erlier than today";
+      if (moment(newTrip.endDate).isAfter(newTrip.startDate)) {
+        isValidEndDate.value = true;
+        calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
+      } else {
+        if (moment(endDate).isBefore(newTrip.startDate)) {
+          isValidEndDate.value = false;
+          errMsg.value = "End date can not before the start date";
+        } else if (moment(newTrip.startDate).isBefore(now)) {
+          errMsg.value = "Start date can not be erlier than today";
+        }
       }
     }
   }
@@ -102,14 +106,15 @@ const validateStart = () => {
 const submitTrip = () => {
   errMsg.value = "";
   validateStart();
-  console.log("start:" + isValidStartDate.value);
-  console.log("end:" + isValidEndDate.value);
+  //console.log("start:" + isValidStartDate.value);
+  //console.log("end:" + isValidEndDate.value);
 
   if (
     isValidStartDate.value == true &&
     isValidEndDate.value == true &&
     newTrip.startDate !== newTrip.endDate
   ) {
+    console.log(daysToSign);
     saveTrip();
     //console.log("good to pass");
   } else {

@@ -169,9 +169,16 @@ onMounted(() => {
         <div class="flex md:w-10/11">
           <figure class="w-44 rounded-md overflow-hidden lg:w-full md:w-full">
             <img
-              class="lg:w-full"
+              v-if="trip.cover"
+              class="w-full"
               :src="getImageSrc(trip.cover)"
-              alt="cover image"
+              :alt="trip.title"
+            />
+            <img
+              v-else
+              class="w-full"
+              src="/images/default_pic.jpg"
+              :alt="trip.title"
             />
           </figure>
 
@@ -423,6 +430,7 @@ onMounted(() => {
       :stops="selectedDayStops"
       :hotel="selectedHotel"
       @close="isModal = false"
+      class="z-50"
     />
   </div>
   <!-- DELETE MODAL -->

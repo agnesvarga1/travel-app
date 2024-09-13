@@ -38,7 +38,6 @@ const controlStopExistence = () => {
 // Trigger controlStopExistence on mount
 onMounted(() => {
   controlStopExistence();
-  console.log(props.trip.endDate);
 });
 </script>
 <template>
@@ -47,7 +46,12 @@ onMounted(() => {
   >
     <div class="md:flex md:flex-col md:jusify-between relative">
       <div class="card-header">
-        <img :src="getImageSrc(trip.cover)" :alt="trip.title" />
+        <img
+          v-if="trip.cover !== ''"
+          :src="getImageSrc(trip.cover)"
+          :alt="trip.title"
+        />
+        <img v-else src="/images/default_pic.jpg" :alt="trip.title" />
       </div>
       <div
         v-if="isDeleteModal"
