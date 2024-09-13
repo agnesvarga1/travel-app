@@ -6,7 +6,7 @@ import MobileHeader from "./components/MobileHeader.vue";
 <template class="relative font-body">
   <MobileHeader />
   <router-view></router-view>
-  <NavMobile />
+  <NavMobile class="xl:hidden" />
 </template>
 
 <style scoped></style>

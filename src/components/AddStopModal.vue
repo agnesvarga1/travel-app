@@ -267,7 +267,7 @@ onMounted(() => {
 
 <template>
   <form
-    class="w-full md:w-1/2 absolute top-0 md:right-1/3"
+    class="w-80 modal md:w-1/2 absolute top-0 left-1/2"
     @submit.prevent="saveItem"
   >
     <div
@@ -306,6 +306,7 @@ onMounted(() => {
           type="text"
           placeholder="City and Stop Name here"
           required
+          maxlength="258"
         />
       </div>
       <div class="mb-4" v-if="props.flag === 'hotel'">
@@ -319,6 +320,7 @@ onMounted(() => {
           type="text"
           placeholder="Name of the Hotel here"
           required
+          maxlength="258"
         />
       </div>
       <div class="mb-4" v-if="props.flag === 'risto'">
@@ -332,6 +334,7 @@ onMounted(() => {
           type="text"
           placeholder="Name of the Restaurant here"
           required
+          maxlength="258"
         />
       </div>
 
@@ -418,6 +421,7 @@ onMounted(() => {
           id="type"
           type="text"
           placeholder="Italian or Chinese"
+          maxlength="124"
         />
       </div>
 

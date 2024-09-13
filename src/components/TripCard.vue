@@ -24,6 +24,8 @@ const props = defineProps({
 let isModal = ref(false);
 let isDeleteModal = ref(false);
 const isDisabled = ref(false);
+const screenWidth = window.screen.width;
+const isSmScreen = screenWidth < 640;
 
 const controlStopExistence = () => {
   // Check if all stops arrays in the days array are empty
@@ -36,11 +38,12 @@ const controlStopExistence = () => {
 // Trigger controlStopExistence on mount
 onMounted(() => {
   controlStopExistence();
+  console.log(props.trip.endDate);
 });
 </script>
 <template>
   <div
-    class="trip-card max-w-md mx-auto shadow-lg mt-3 rounded-lg overflow-hidden realtive"
+    class="trip-card md:max-w-md mx-auto shadow-lg mt-3 rounded-lg overflow-hidden realtive"
   >
     <div class="md:flex md:flex-col md:jusify-between relative">
       <div class="card-header">
@@ -50,8 +53,9 @@ onMounted(() => {
         v-if="isDeleteModal"
         class="top-0 bottom-0 bg-black bg-opacity-50 absolute w-full z-20"
       ></div>
+      <!-- DELETE TRIP MODAL -->
       <div
-        v-if="isDeleteModal"
+        v-if="isDeleteModal && !isSmScreen"
         class="modal mx-auto mt-20 bg-white shadow-lg p-3 rounded-lg w-80 top-1/3 left-1/2 absolute z-50"
       >
         <h2 class="font-heading text-dark text-xl">
@@ -67,8 +71,6 @@ onMounted(() => {
         </div>
       </div>
       <div class="card-body p-2 relative">
-        <!-- DELETE TRIP MODAL -->
-
         <div class="flex justify-between">
           <div class="text-sm mb-2">
             <h2 class="text-primary font-heading text-xl md:text-3xl">
@@ -78,7 +80,9 @@ onMounted(() => {
             <span class="font-body text-dark md:text-xl"
               >From: {{ trip.startDate }} </span
             ><br />
-            <span class="font-body md:text-xl"> To: {{ trip.endDate }}</span>
+            <span v-if="trip.endDate" class="font-body md:text-xl">
+              To: {{ trip.endDate }}</span
+            >
           </div>
           <div
             @click="isModal = true"
@@ -107,6 +111,23 @@ onMounted(() => {
     </div>
   </div>
   <LocationsMap v-if="isModal" @close="isModal = false" :id="trip.id" />
+  <!-- DELETE TRIP MODAL FOR SM -->
+  <div
+    v-if="isDeleteModal && isSmScreen"
+    class="modal mx-auto mt-20 bg-white shadow-lg p-3 rounded-lg w-80 top-1/3 left-1/2 absolute z-50"
+  >
+    <h2 class="font-heading text-dark text-xl">
+      Are you sure to DELETE this
+      <span class="text-accent uppercase">{{ props.trip.title }} </span>
+      trip?
+    </h2>
+    <div class="flex justify-end gap-1 mt-3">
+      <PrimaryBtn @click="tripsStore.deleteTripFromDB(trip.id)"
+        >Delete</PrimaryBtn
+      >
+      <SecondaryBtn @click="isDeleteModal = false">Cancel</SecondaryBtn>
+    </div>
+  </div>
 </template>
 <style scoped>
 .modal {

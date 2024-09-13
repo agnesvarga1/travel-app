@@ -157,13 +157,13 @@ onMounted(() => {
 
 <template class="relative">
   <div
-    v-if="isDeleteModal || isStopModal || isNoteModal"
-    class="top-0 bottom-0 bg-black bg-opacity-50 absolute lg:w-10/12 z-10 w-full"
-  ></div>
-  <div
-    class="bg-light rounded-t-lg mt-14 p-3 main-container md:text-lg lg:px-20 relative"
+    class="bg-light rounded-t-lg mt-14 md:mt-20 p-3 main-container md:text-lg lg:px-10 relative"
     :class="{ 'overflow-hidden': isDeleteModal || isStopModal || isNoteModal }"
   >
+    <div
+      v-if="isDeleteModal || isStopModal || isNoteModal"
+      class="top-0 bottom-0 bg-black bg-opacity-50 absolute z-10 w-full h-full"
+    ></div>
     <div v-if="trip">
       <div class="lg:flex">
         <div class="flex md:w-10/11">

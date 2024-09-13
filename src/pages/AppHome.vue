@@ -68,16 +68,18 @@ watch(
 </script>
 
 <template>
-  <div class="bg-light rounded-t-lg mt-14 p-3 main-container shadow-2xl">
+  <div
+    class="bg-light rounded-t-lg mt-14 md:mt-20 p-3 main-container shadow-2xl"
+  >
     <h1
       v-if="ongoingTrip"
-      class="text-accent text-2xl font-semibold mt-2 sm:w-full md:w-10/12 md:mx-auto"
+      class="text-accent text-2xl md:text-4xl font-semibold mt-2 sm:w-full md:w-10/12 md:mx-auto"
     >
       Happening Now
     </h1>
     <h1
       v-else-if="upcomingTrip"
-      class="text-accent text-2xl font-semibold mt-2 sm:w-full md:w-10/12 md:mx-auto"
+      class="text-accent text-2xl md:text-4xl text-center font-semibold mt-2 sm:w-full md:w-10/12 md:mx-auto"
     >
       Next Holiday
     </h1>
@@ -93,7 +95,7 @@ watch(
     </div>
     <h1
       v-else-if="upcomingTrip === null && ongoingTrip === null"
-      class="text-accent text-2xl font-semibold mt-2"
+      class="text-accent text-2xl md:text-3xl text-center font-semibold mt-2"
     >
       No trip planned! Click
       <router-link

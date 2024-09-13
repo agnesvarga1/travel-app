@@ -1,15 +1,17 @@
 <script setup>
 import PrimaryBtn from "../components/PrimaryBtn.vue";
-import { reactive, ref, watch, toRaw } from "vue";
+import { reactive, ref, watch, toRaw, onMounted } from "vue";
 import moment from "moment";
 import { insertTrips } from "../utils/idb";
 
 const isSuccessMessage = ref(false);
 const isOneDay = ref(false);
 const successMessage = ref("");
-
+const errMsg = ref("");
+const now = moment().format("YYYY-MM-DD");
 const datesArray = ref([]);
-
+const isValidEndDate = ref(null);
+const isValidStartDate = ref(null);
 const daysToSign = reactive([]);
 const newTrip = reactive({
   title: "",
@@ -71,9 +73,52 @@ const handleImage = async (e) => {
 watch(
   [() => newTrip.startDate, () => newTrip.endDate],
   ([startDate, endDate]) => {
-    calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
+    errMsg.value = "";
+    isValidEndDate.value = null;
+    if (moment(newTrip.endDate).isAfter(newTrip.startDate)) {
+      isValidEndDate.value = true;
+      calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
+    } else {
+      if (moment(endDate).isBefore(newTrip.startDate)) {
+        isValidEndDate.value = false;
+        errMsg.value = "End date can not before the start date";
+      } else if (moment(newTrip.startDate).isBefore(now)) {
+        errMsg.value = "Start date can not be erlier than today";
+      }
+    }
   }
 );
+
+const validateStart = () => {
+  errMsg.value = "";
+  if (moment(newTrip.startDate).isAfter(now)) {
+    isValidStartDate.value = true;
+  } else {
+    errMsg.value = "Trip start date can not be an earlier date than today!";
+    isValidStartDate.value = false;
+  }
+};
+
+const submitTrip = () => {
+  errMsg.value = "";
+  validateStart();
+  console.log("start:" + isValidStartDate.value);
+  console.log("end:" + isValidEndDate.value);
+
+  if (
+    isValidStartDate.value == true &&
+    isValidEndDate.value == true &&
+    newTrip.startDate !== newTrip.endDate
+  ) {
+    saveTrip();
+    //console.log("good to pass");
+  } else {
+    if (moment(newTrip.endDate).isBefore(newTrip.startDate)) {
+      errMsg.value = "Wrong End Date";
+    }
+    // console.log("nope");
+  }
+};
 
 const saveTrip = async () => {
   try {
@@ -111,14 +156,19 @@ const saveTrip = async () => {
 </script>
 
 <template>
-  <div class="overflow-auto pb-20">
+  <div class="pb-20 rounded-xl overflow-hidden">
     <div
-      class="max-w-md mx-auto md:mt-20 mt-12 bg-white shadow-lg rounded-lg overflow-auto"
+      class="max-w-md mx-auto mt-20 m bg-white shadow-lg rounded-lg overflow-auto"
     >
       <div
-        class="md:text-2xl xs:text-lg py-2 md:py-4 px-6 bg-accent text-white text-center font-heading uppercase"
+        class="md:text-2xl xs:text-lg rounded-t-md py-2 md:py-4 px-6 bg-accent text-white text-center font-heading uppercase"
       >
         Add a new trip
+      </div>
+      <div class="w-full text-accent text-center" v-if="errMsg !== ''">
+        <h2>
+          {{ errMsg }}
+        </h2>
       </div>
       <div class="py-4 px-6">
         <div class="mb-4">
@@ -131,6 +181,7 @@ const saveTrip = async () => {
             id="name"
             type="text"
             placeholder="My holiday title"
+            maxlength="256"
             required
           />
         </div>
@@ -201,11 +252,12 @@ const saveTrip = async () => {
             id="message"
             rows="4"
             placeholder="Description of the journey goes here"
+            maxlength="2048"
           ></textarea>
         </div>
 
         <div class="flex items-center justify-center mb-4">
-          <PrimaryBtn @click="saveTrip"> Add Trip </PrimaryBtn>
+          <PrimaryBtn @click="submitTrip"> Add Trip </PrimaryBtn>
         </div>
       </div>
     </div>
