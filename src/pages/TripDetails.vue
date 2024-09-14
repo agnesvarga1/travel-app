@@ -160,11 +160,11 @@ onMounted(() => {
     class="bg-light rounded-t-lg mt-14 md:mt-20 p-3 main-container md:text-lg lg:px-10 relative"
     :class="{ 'overflow-hidden': isDeleteModal || isStopModal || isNoteModal }"
   >
-    <div
-      v-if="isDeleteModal || isStopModal || isNoteModal"
-      class="top-0 bottom-0 bg-black bg-opacity-50 absolute z-10 w-full h-full"
-    ></div>
-    <div v-if="trip">
+    <div class="relative" v-if="trip">
+      <div
+        v-if="isDeleteModal || isStopModal || isNoteModal"
+        class="top-0 bottom-0 bg-black bg-opacity-50 fixed z-10 left-0 right-0"
+      ></div>
       <div class="lg:flex">
         <div class="flex md:w-10/11">
           <figure class="w-44 rounded-md overflow-hidden lg:w-full md:w-full">
