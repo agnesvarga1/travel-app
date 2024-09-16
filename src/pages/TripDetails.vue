@@ -166,35 +166,40 @@ onMounted(() => {
         class="top-0 bottom-0 bg-black bg-opacity-50 fixed z-10 left-0 right-0"
       ></div>
       <div class="lg:flex">
-        <div class="flex md:w-10/11">
-          <figure
-            class="w-44 rounded-md h-96 overflow-hidden lg:w-full md:w-full object-center"
+        <div class="flex flex-col md:flex-row md:w-10/11">
+          <div
+            class="lg:flex text-xs md:p-3 pt-1 text-dark font-body md:w-full md:gap-2"
           >
-            <img
-              v-if="trip.cover"
-              class="w-full h-full"
-              :src="getImageSrc(trip.cover)"
-              :alt="trip.title"
-            />
-            <img
-              v-else
-              class="w-full"
-              src="/images/default_pic.jpg"
-              :alt="trip.title"
-            />
-          </figure>
-
-          <div class="text-xs p-3 pt-1 text-dark font-body md:w-full">
-            <h1
-              class="text-accent text-xl font-semibold font-heading md:text-4xl"
+            <div class="md:w-1/2 md:order-2">
+              <h1
+                class="text-accent text-xl font-semibold font-heading md:text-4xl"
+              >
+                {{ trip.title }}
+              </h1>
+              <p class="md:text-xl">
+                <span v-if="trip.endDate"> From:</span> <span v-else>On:</span>
+                {{ trip.startDate }}
+              </p>
+              <p class="md:text-xl" v-if="trip.endDate">
+                To: {{ trip.endDate }}
+              </p>
+            </div>
+            <figure
+              class="w-64 md:w-1/2 lg:w-full rounded-md overflow-hidden md:order-1"
             >
-              {{ trip.title }}
-            </h1>
-            <p class="md:text-xl">
-              <span v-if="trip.endDate"> From:</span> <span v-else>On:</span>
-              {{ trip.startDate }}
-            </p>
-            <p class="md:text-xl" v-if="trip.endDate">To: {{ trip.endDate }}</p>
+              <img
+                v-if="trip.cover"
+                class="w-full"
+                :src="getImageSrc(trip.cover)"
+                :alt="trip.title"
+              />
+              <img
+                v-else
+                class="w-full"
+                src="/images/default_pic.jpg"
+                :alt="trip.title"
+              />
+            </figure>
           </div>
         </div>
 
