@@ -10,7 +10,10 @@
 
     <p class="text-body text-dark text-lg lg:text-xl">
       I developed this app to help users track their travels and holiday
-      destinations. Here's how it works:
+      destinations. The app was built with a mobile-first design approach,
+      meaning it looks great on smaller screens and is optimized for use on
+      smartphones. This allows users to easily access their travel plans
+      anytime, anywhere. Here's how it works:
     </p>
 
     <h2 class="text-accent text-2xl md:text-3xl text-bold mb-2 mt-3">
