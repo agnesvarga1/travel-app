@@ -15,6 +15,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "axios": "^1.7.6",
+    "https-localhost": "^4.7.1",
     "idb": "^8.0.0",
     "leaflet": "^1.9.4",
     "lodash-es": "^4.17.21",
@@ -28,6 +29,7 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
     "tailwindcss": "^2.0.4",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "vite-plugin-pwa": "^0.20.5"
   }
 }
