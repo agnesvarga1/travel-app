@@ -40,6 +40,17 @@ const isActive = (path) => {
       <font-awesome-icon :icon="['fas', 'bars']" class="text-dark text-2xl" />
       <span class="text-dark text-2xl icon"> All Trip List</span>
     </router-link>
+    <router-link
+      :to="{ name: 'about' }"
+      class="relative p-1 text-center nav-item"
+      :class="{ active: isActive('/about') }"
+    >
+      <font-awesome-icon
+        :icon="['fas', 'info']"
+        class="text-dark text-2xl"
+      ></font-awesome-icon>
+      <span class="text-dark text-2xl icon"> About</span>
+    </router-link>
   </div>
 </template>
 

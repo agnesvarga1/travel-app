@@ -167,10 +167,12 @@ onMounted(() => {
       ></div>
       <div class="lg:flex">
         <div class="flex md:w-10/11">
-          <figure class="w-44 rounded-md overflow-hidden lg:w-full md:w-full">
+          <figure
+            class="w-44 rounded-md h-96 overflow-hidden lg:w-full md:w-full object-center"
+          >
             <img
               v-if="trip.cover"
-              class="w-full"
+              class="w-full h-full"
               :src="getImageSrc(trip.cover)"
               :alt="trip.title"
             />

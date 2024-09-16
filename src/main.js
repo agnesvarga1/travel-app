@@ -15,6 +15,7 @@ import {
   faMapMarkerAlt,
   faUtensils,
   faHotel,
+  faInfo,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* import font awesome icon component */
@@ -27,7 +28,8 @@ library.add(
   faMapLocationDot,
   faMapMarkerAlt,
   faUtensils,
-  faHotel
+  faHotel,
+  faInfo
 );
 
 const pinia = createPinia();

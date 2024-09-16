@@ -46,12 +46,15 @@ onMounted(() => {
   >
     <div class="md:flex md:flex-col md:jusify-between relative">
       <div class="card-header">
-        <img
-          v-if="trip.cover !== ''"
-          :src="getImageSrc(trip.cover)"
-          :alt="trip.title"
-        />
-        <img v-else src="/images/default_pic.jpg" :alt="trip.title" />
+        <figure class="h-80">
+          <img
+            class="h-full object-cover w-full"
+            v-if="trip.cover !== ''"
+            :src="getImageSrc(trip.cover)"
+            :alt="trip.title"
+          />
+          <img v-else src="/images/default_pic.jpg" :alt="trip.title" />
+        </figure>
       </div>
       <div
         v-if="isDeleteModal"
