@@ -35,7 +35,7 @@
       a travel plan looks like.
     </p>
     <p class="text-body text-dark text-lg lg:text-xl">
-      If needed, you can delete any or all trips from the list. All deletions
+      If needed, you can delete any or all trips from the list. All additions
       and cancellations are dynamically recorded in the browser, ensuring the
       app remains personalized for each user.
     </p>
