@@ -138,6 +138,7 @@ const fetchCoordinates = async () => {
       }
     );
     if (response.data.features && response.data.features.length > 0) {
+      // console.log(response.data.features);
       suggestions.value = response.data.features;
       //console.log(suggestions.value);
     } else {
@@ -204,13 +205,15 @@ const selectAddress = (i) => {
     newStop.latitude = updatedStop.latitude;
     newStop.longitude = updatedStop.longitude;
   } else if (props.flag === "hotel") {
+    address.value = suggestions.value[i].place_name;
     const updatedHotel = {
       ...newHotel, // Copy existing data
       latitude,
       longitude,
     };
+
     suggestions.value = [];
-    // Update the singleStop reactive object
+
     newHotel.name = updatedHotel.name;
     newHotel.address = address.value;
     newHotel.checkIn = updatedHotel.checkIn;
@@ -218,6 +221,7 @@ const selectAddress = (i) => {
     newHotel.latitude = updatedHotel.latitude;
     newHotel.longitude = updatedHotel.longitude;
   } else if (props.flag === "risto") {
+    address.value = suggestions.value[i].place_name;
     const updatedRisto = {
       ...newRisto, // Copy existing data
       latitude,

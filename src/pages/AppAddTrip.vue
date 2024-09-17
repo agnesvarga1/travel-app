@@ -162,7 +162,8 @@ const saveTrip = async () => {
 
 <template>
   <div class="pb-20 rounded-xl overflow-hidden">
-    <div
+    <form
+      @submit.prevent="submitTrip"
       class="max-w-md mx-auto mt-20 m bg-white shadow-lg rounded-lg overflow-auto"
     >
       <div
@@ -262,10 +263,10 @@ const saveTrip = async () => {
         </div>
 
         <div class="flex items-center justify-center mb-4">
-          <PrimaryBtn @click="submitTrip"> Add Trip </PrimaryBtn>
+          <PrimaryBtn type="submit"> Add Trip </PrimaryBtn>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 
   <div v-if="isSuccessMessage" class="w-full absolute top-10">
