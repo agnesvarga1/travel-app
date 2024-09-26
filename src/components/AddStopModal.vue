@@ -18,6 +18,7 @@ const tripsStore = useTripsStore();
 const address = ref("");
 const suggestions = ref([]);
 const errMsg = ref("");
+const isSelected = ref(false);
 const props = defineProps({
   tripId: {
     type: Number,
@@ -95,7 +96,6 @@ const validateDates = (date1, date2) => {
     });
   }
 
-  //console.log(moment(date1).isAfter(moment(startDate)));
   if (
     (moment(date1).isAfter(moment(startDate)) ||
       moment(date1).isSame(startDate)) &&
@@ -120,7 +120,7 @@ const validateDates = (date1, date2) => {
 };
 
 const fetchCoordinates = async () => {
-  if (!address.value) {
+  if (!address.value || isSelected.value == true) {
     return;
   }
 
@@ -140,7 +140,7 @@ const fetchCoordinates = async () => {
     if (response.data.features && response.data.features.length > 0) {
       // console.log(response.data.features);
       suggestions.value = response.data.features;
-      //console.log(suggestions.value);
+      console.log(suggestions.value);
     } else {
       console.error("No coordinates found for the given address");
     }
@@ -205,6 +205,7 @@ const selectAddress = (i) => {
     newStop.latitude = updatedStop.latitude;
     newStop.longitude = updatedStop.longitude;
   } else if (props.flag === "hotel") {
+    isSelected.value = true;
     address.value = suggestions.value[i].place_name;
     const updatedHotel = {
       ...newHotel, // Copy existing data
@@ -221,6 +222,7 @@ const selectAddress = (i) => {
     newHotel.latitude = updatedHotel.latitude;
     newHotel.longitude = updatedHotel.longitude;
   } else if (props.flag === "risto") {
+    isSelected.value = true;
     address.value = suggestions.value[i].place_name;
     const updatedRisto = {
       ...newRisto, // Copy existing data
@@ -238,9 +240,6 @@ const selectAddress = (i) => {
 };
 
 const saveItem = async () => {
-  // console.log("Saving stop...");
-  // console.log("newStop:", newStop); // Log the entire reactive object
-  // console.log("Stop name:", newStop.title); // Log the specific property you need
   if (props.flag === "stop") {
     const stop = toRaw(newStop); // Convert to a plain object
     await tripsStore.addStopToTrip(props.tripId, props.dayIndex, stop);
@@ -252,7 +251,7 @@ const saveItem = async () => {
       return;
     } else if (errMsg.value == "") {
       const hotel = toRaw(newHotel);
-      console.log(hotel);
+      //console.log(hotel);
       await tripsStore.addHotelToTrip(props.tripId, hotel);
       emit("close");
     }
