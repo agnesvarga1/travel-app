@@ -4,6 +4,9 @@ import { reactive, ref, watch, toRaw, onMounted } from "vue";
 import moment from "moment";
 import { insertTrips } from "../utils/idb";
 
+import { useImageStore } from "../stores/imageStore";
+const imageStore = useImageStore();
+
 const isSuccessMessage = ref(false);
 const isOneDay = ref(false);
 const successMessage = ref("");
@@ -49,24 +52,31 @@ const calculateDays = (startDate, endDate) => {
   });
 };
 
-const createBase64Image = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      resolve(reader.result); // Base64 string
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
+// const createBase64Image = (file) => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.onloadend = () => {
+//       resolve(reader.result); // Base64 string
+//     };
+//     reader.onerror = reject;
+//     reader.readAsDataURL(file);
+//   });
+// };
+
+// const handleImage = async (e) => {
+//   const selectedImage = e.target.files[0];
+//   try {
+//     const base64Image = await createBase64Image(selectedImage);
+//     newTrip.cover = base64Image;
+//   } catch (error) {
+//     console.error("Error converting image to Base64:", error);
+//   }
+// };
 
 const handleImage = async (e) => {
-  const selectedImage = e.target.files[0];
-  try {
-    const base64Image = await createBase64Image(selectedImage);
-    newTrip.cover = base64Image;
-  } catch (error) {
-    console.error("Error converting image to Base64:", error);
+  const base64Image = await imageStore.handleImage(e); // Use the method from the store
+  if (base64Image) {
+    newTrip.cover = base64Image; // Set the base64 image to newTrip.cover
   }
 };
 
@@ -116,7 +126,6 @@ const submitTrip = () => {
   ) {
     console.log(daysToSign);
     saveTrip();
-    //console.log("good to pass");
   } else {
     if (moment(newTrip.endDate).isBefore(newTrip.startDate)) {
       errMsg.value = "Wrong End Date";
