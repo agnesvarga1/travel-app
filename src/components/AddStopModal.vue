@@ -1,19 +1,15 @@
 <script setup>
 import PrimaryBtn from "../components/PrimaryBtn.vue";
-import {
-  reactive,
-  ref,
-  watch,
-  toRaw,
-  defineEmits,
-  computed,
-  onMounted,
-} from "vue";
+import { reactive, ref, watch, toRaw, onMounted } from "vue";
 import { useTripsStore } from "../stores/trips";
 
 import axios from "axios";
 import { debounce } from "lodash-es";
 import moment from "moment";
+
+import { useImageStore } from "../stores/imageStore";
+const imageStore = useImageStore();
+
 const tripsStore = useTripsStore();
 const address = ref("");
 const suggestions = ref([]);
@@ -38,6 +34,7 @@ const newStop = reactive([
   {
     title: "",
     description: "",
+    img: "",
     latitude: null,
     longitude: null,
     notes: "",
@@ -238,7 +235,12 @@ const selectAddress = (i) => {
     newRisto.longitude = updatedRisto.longitude;
   }
 };
-
+const handleImage = async (e) => {
+  const base64Image = await imageStore.handleImage(e); // Use the method from the store
+  if (base64Image) {
+    newStop.img = base64Image; // Set the base64 image to newTrip.cover
+  }
+};
 const saveItem = async () => {
   if (props.flag === "stop") {
     const stop = toRaw(newStop); // Convert to a plain object
@@ -301,7 +303,9 @@ onMounted(() => {
       </h3>
 
       <div class="mb-4" v-if="props.flag === 'stop'">
-        <label class="block text-dark font-body mb-2" for="name"> </label>
+        <label class="block text-dark font-body mb-2" for="name">
+          Name|Title
+        </label>
         <input
           v-model="newStop.title"
           class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
@@ -427,7 +431,18 @@ onMounted(() => {
           maxlength="124"
         />
       </div>
-
+      <div class="mb-4" v-if="props.flag === 'stop'">
+        <label class="block text-dark font-body mb-2" for="img"
+          >Add an image
+        </label>
+        <input
+          @change="handleImage"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-dark leading-tight focus:outline-none focus:shadow-outline"
+          id="img"
+          type="file"
+          accept="image/*"
+        />
+      </div>
       <PrimaryBtn type="submit" class="capitalize">
         Save {{ props.flag }}
       </PrimaryBtn>
