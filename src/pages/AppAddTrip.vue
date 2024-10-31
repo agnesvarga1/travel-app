@@ -1,6 +1,6 @@
 <script setup>
 import PrimaryBtn from "../components/PrimaryBtn.vue";
-import { reactive, ref, watch, toRaw, onMounted } from "vue";
+import { reactive, ref, watchEffect, toRaw, onMounted } from "vue";
 import moment from "moment";
 import { insertTrips } from "../utils/idb";
 
@@ -13,7 +13,7 @@ const successMessage = ref("");
 const errMsg = ref("");
 const now = moment().format("YYYY-MM-DD");
 const datesArray = ref([]);
-const isValidEndDate = ref(true);
+const isValidEndDate = ref(null);
 const isValidStartDate = ref(null);
 const daysToSign = reactive([]);
 const newTrip = reactive({
@@ -24,14 +24,15 @@ const newTrip = reactive({
   description: "",
   days: daysToSign, // This will be populated with day objects
 });
-
+///Function that calculate days if its has start and end date
 const calculateDays = (startDate, endDate) => {
   datesArray.value = [];
 
-  if (isOneDay.value === true || !endDate) {
+  if (isOneDay.value === true) {
     datesArray.value.push(moment(startDate).format("YYYY-MM-DD"));
   } else if (startDate && endDate && isOneDay.value === false) {
     let currentDate = moment(startDate).format("YYYY-MM-DD");
+
     const formattedEndDate = moment(endDate).format("YYYY-MM-DD");
 
     datesArray.value.push(currentDate);
@@ -52,26 +53,30 @@ const calculateDays = (startDate, endDate) => {
   });
 };
 
-// const createBase64Image = (file) => {
-//   return new Promise((resolve, reject) => {
-//     const reader = new FileReader();
-//     reader.onloadend = () => {
-//       resolve(reader.result); // Base64 string
-//     };
-//     reader.onerror = reject;
-//     reader.readAsDataURL(file);
-//   });
-// };
-
-// const handleImage = async (e) => {
-//   const selectedImage = e.target.files[0];
-//   try {
-//     const base64Image = await createBase64Image(selectedImage);
-//     newTrip.cover = base64Image;
-//   } catch (error) {
-//     console.error("Error converting image to Base64:", error);
-//   }
-// };
+const validateStart = () => {
+  if (newTrip.startDate) {
+    if (moment(newTrip.startDate).isAfter(now)) {
+      isValidStartDate.value = true;
+    } else {
+      errMsg.value = "Trip start date can not be an earlier date than today!";
+      isValidStartDate.value = false;
+    }
+  }
+};
+const validateEnd = () => {
+  if (newTrip.endDate) {
+    if (
+      moment(newTrip.endDate).isAfter(newTrip.startDate) &&
+      moment(newTrip.endDate).isAfter(now)
+    ) {
+      isValidEndDate.value = true;
+    } else {
+      isValidStartDate.value = false;
+      errMsg.value =
+        "Trip end date can not be an the same date or earlier than start date or before today!";
+    }
+  }
+};
 
 const handleImage = async (e) => {
   const base64Image = await imageStore.handleImage(e); // Use the method from the store
@@ -80,57 +85,34 @@ const handleImage = async (e) => {
   }
 };
 
-watch(
-  [() => newTrip.startDate, () => newTrip.endDate],
-  ([startDate, endDate]) => {
-    errMsg.value = "";
+watchEffect(() => {
+  const startDate = newTrip.startDate;
+  const endDate = newTrip.endDate;
+  errMsg.value = "";
+  // isValidEndDate.value = true;
+
+  if (isOneDay.value == true) {
+    validateStart();
     isValidEndDate.value = true;
-    if (isOneDay) {
-      calculateDays(startDate, endDate); // Treat as a one-day trip
-    } else {
-      if (moment(newTrip.endDate).isAfter(newTrip.startDate)) {
-        isValidEndDate.value = true;
-        calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
-      } else {
-        if (moment(endDate).isBefore(newTrip.startDate)) {
-          isValidEndDate.value = false;
-          errMsg.value = "End date can not before the start date";
-        } else if (moment(newTrip.startDate).isBefore(now)) {
-          errMsg.value = "Start date can not be erlier than today";
-        }
-      }
+
+    calculateDays(startDate, endDate); // Treat as a one-day trip
+  } else {
+    validateStart();
+    validateEnd();
+
+    if (isValidStartDate.value == true && isValidEndDate.value == true) {
+      //  console.log(isValidStartDate.value, isValidEndDate.value);
+      calculateDays(startDate, endDate); // Recalculate days when startDate or endDate changes
     }
   }
-);
-
-const validateStart = () => {
-  errMsg.value = "";
-  if (moment(newTrip.startDate).isAfter(now)) {
-    isValidStartDate.value = true;
-  } else {
-    errMsg.value = "Trip start date can not be an earlier date than today!";
-    isValidStartDate.value = false;
-  }
-};
+});
 
 const submitTrip = () => {
-  errMsg.value = "";
-  validateStart();
-  //console.log("start:" + isValidStartDate.value);
-  //console.log("end:" + isValidEndDate.value);
-
-  if (
-    isValidStartDate.value == true &&
-    isValidEndDate.value == true &&
-    newTrip.startDate !== newTrip.endDate
-  ) {
+  if (isValidStartDate.value == true && isValidEndDate.value == true) {
     console.log(daysToSign);
     saveTrip();
   } else {
-    if (moment(newTrip.endDate).isBefore(newTrip.startDate)) {
-      errMsg.value = "Wrong End Date";
-    }
-    // console.log("nope");
+    errMsg.value = errMsg.value;
   }
 };
 
